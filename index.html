@@ -17,7 +17,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Mathilda's 18ter Geburtstag — Studio 54">
   <meta property="og:description" content="Einladung zu Mathildas 18. Geburtstag — Studio 54 Night, 23. Januar 2027, Moers-Kapellen.">
-  <meta property="og:image" content="images/einladung_de_titel.jpg">
+  <meta property="og:image" content="images/einladung_1_de.jpeg">
   <meta property="og:locale" content="de_DE">
   <meta property="og:locale:alternate" content="en_US">
   <meta property="og:locale:alternate" content="pl_PL">
@@ -26,7 +26,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Mathilda's 18ter Geburtstag — Studio 54">
   <meta name="twitter:description" content="Einladung zu Mathildas 18. Geburtstag — Studio 54 Night, 23. Januar 2027, Moers-Kapellen.">
-  <meta name="twitter:image" content="images/einladung_de_titel.jpg">
+  <meta name="twitter:image" content="images/einladung_1_de.jpeg">
 
   <!-- Google Fonts: Monoton (70er-Headlines) + Josefin Sans (lesbare Sekundärfont) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -71,12 +71,11 @@
     <div class="sprach-overlay__inhalt">
       <p class="overlay-klein">✦ Studio 54 Night ✦</p>
       <h1 class="sprach-overlay__titel">Mathilda&rsquo;s 18ter Geburtstag</h1>
-      <p class="sprach-overlay__text" data-i18n="overlay_u_text">Das Motto: <em>Studio 54</em> — wähle deine Sprache</p>
 
-      <div class="sprach-buttons" data-i18n-aria="overlay_aria_klein">
-        <button type="button" class="sprach-button reveal-glow" data-sprache="de" lang="de">Deutsch</button>
-        <button type="button" class="sprach-button reveal-glow" data-sprache="en" lang="en">English</button>
-        <button type="button" class="sprach-button reveal-glow" data-sprache="pl" lang="pl">Polski</button>
+      <div class="sprach-buttons">
+        <button type="button" class="sprach-button" data-sprache="de" lang="de">Deutsch</button>
+        <button type="button" class="sprach-button" data-sprache="en" lang="en">ENGLISH</button>
+        <button type="button" class="sprach-button" data-sprache="pl" lang="pl">Polski</button>
       </div>
     </div>
   </section>
@@ -144,23 +143,24 @@
       <!-- Carousel: horizontales Scrollen mit Scroll-Snap = natives Swipe auf Mobil -->
       <div class="carousel" id="carousel" tabindex="0">
         <div class="carousel__spur" id="carousel-spur">
-          <figure class="carousel__karte reveal">
-            <img src="images/einladung_de_titel.jpg" alt="" data-i18n-alt="galerie_alt_de_titel" loading="lazy" decoding="async">
+          <!-- data-lang = Karte wird nur bei passender Sprachwahl angezeigt -->
+          <figure class="carousel__karte reveal" data-lang="de">
+            <img src="images/einladung_1_de.jpeg" alt="" data-i18n-alt="galerie_alt_de_titel" loading="lazy" decoding="async">
           </figure>
-          <figure class="carousel__karte reveal">
-            <img src="images/einladung_de_details.jpg" alt="" data-i18n-alt="galerie_alt_de_details" loading="lazy" decoding="async">
+          <figure class="carousel__karte reveal" data-lang="de">
+            <img src="images/einladung_2_de.jpeg" alt="" data-i18n-alt="galerie_alt_de_details" loading="lazy" decoding="async">
           </figure>
-          <figure class="carousel__karte reveal">
-            <img src="images/einladung_en_titel.jpg" alt="" data-i18n-alt="galerie_alt_en_titel" loading="lazy" decoding="async">
+          <figure class="carousel__karte reveal" data-lang="en" hidden>
+            <img src="images/einladung_1_en.jpeg" alt="" data-i18n-alt="galerie_alt_en_titel" loading="lazy" decoding="async">
           </figure>
-          <figure class="carousel__karte reveal">
-            <img src="images/einladung_en_details.jpg" alt="" data-i18n-alt="galerie_alt_en_details" loading="lazy" decoding="async">
+          <figure class="carousel__karte reveal" data-lang="en" hidden>
+            <img src="images/einladung_2_en.jpeg" alt="" data-i18n-alt="galerie_alt_en_details" loading="lazy" decoding="async">
           </figure>
-          <figure class="carousel__karte reveal">
-            <img src="images/einladung_pl_titel.jpg" alt="" data-i18n-alt="galerie_alt_pl_titel" loading="lazy" decoding="async">
+          <figure class="carousel__karte reveal" data-lang="pl" hidden>
+            <img src="images/einladung_1_pl.jpeg" alt="" data-i18n-alt="galerie_alt_pl_titel" loading="lazy" decoding="async">
           </figure>
-          <figure class="carousel__karte reveal">
-            <img src="images/einladung_pl_details.jpg" alt="" data-i18n-alt="galerie_alt_pl_details" loading="lazy" decoding="async">
+          <figure class="carousel__karte reveal" data-lang="pl" hidden>
+            <img src="images/einladung_2_pl.jpeg" alt="" data-i18n-alt="galerie_alt_pl_details" loading="lazy" decoding="async">
           </figure>
         </div>
         <div class="carousel__punkte" id="carousel-punkte" aria-hidden="true"></div>

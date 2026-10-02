@@ -164,9 +164,12 @@ function wendeSpracheAn(lang) {
 
   // Hero-Bild passend zur Sprache wählen
   if (dom.heroBild) {
-    dom.heroBild.src = 'images/einladung_' + lang + '_titel.jpg';
+    dom.heroBild.src = 'images/einladung_1_' + lang + '.jpeg';
     dom.heroBild.alt = uebersetzung(lang, 'hero_bild_alt') || '';
   }
+
+  // Galerie auf die gewählte Sprache eingrenzen: nur deren 2 Karten anzeigen
+  aktualisiereGalerieSprache(lang);
 
   aktualisiereSoundButton();
 }
@@ -366,23 +369,13 @@ function baueSterne() {
 
 
 /* ============================================================
-   CAROUSEL — horizontales Scrollen (Swipe auf Mobil) + Punkte
+   CAROUSEL — horizontales Scrollen (Swipe auf Mobil) + Punkte.
+   Sichtbar sind nur die 2 Karten der gewählten Sprache
+   (Filter in aktualisiereGalerieSprache()).
    ============================================================ */
 function initialisiereCarousel() {
-  const karten = dom.carouselSpur.querySelectorAll('.carousel__karte');
-
-  // Navigations-Punkte erzeugen
-  karten.forEach((_, index) => {
-    const punkt = document.createElement('button');
-    punkt.type = 'button';
-    punkt.className = 'carousel__punkt';
-    punkt.setAttribute('aria-label', 'Karte ' + (index + 1));
-    punkt.addEventListener('click', () => {
-      const ziel = karten[index];
-      dom.carouselSpur.scrollTo({ left: ziel.offsetLeft - dom.carouselSpur.offsetLeft, behavior: 'smooth' });
-    });
-    dom.carouselPunkte.appendChild(punkt);
-  });
+  // Navigations-Punkte erzeugen (einmalig für alle sichtbaren Karten)
+  baueCarouselPunkte();
 
   // Aktiven Punkt beim Scrollen bestimmen (entprellt)
   let scrollTimeout = null;
@@ -390,14 +383,52 @@ function initialisiereCarousel() {
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(aktualisiereCarouselPunkte, 80);
   });
+}
+
+// Galerie auf die gewählte Sprache eingrenzen: Karten anderer
+// Sprachen ausblenden, Punkte neu aufbauen, scroll zurück zum Anfang.
+function aktualisiereGalerieSprache(lang) {
+  dom.carouselSpur.querySelectorAll('.carousel__karte').forEach((karte) => {
+    karte.hidden = karte.dataset.lang !== lang;
+  });
+  dom.carouselSpur.scrollTo({ left: 0 });
+  baueCarouselPunkte();
+}
+
+// Navigations-Punkte für alle aktuell sichtbaren Karten neu erzeugen
+function baueCarouselPunkte() {
+  dom.carouselPunkte.innerHTML = '';
+  const sichtbareKarten = sichtbareCarouselKarten();
+
+  sichtbareKarten.forEach((karte, index) => {
+    const punkt = document.createElement('button');
+    punkt.type = 'button';
+    punkt.className = 'carousel__punkt';
+    punkt.setAttribute('aria-label', 'Karte ' + (index + 1));
+    punkt.addEventListener('click', () => {
+      dom.carouselSpur.scrollTo({ left: karte.offsetLeft - dom.carouselSpur.offsetLeft, behavior: 'smooth' });
+    });
+    dom.carouselPunkte.appendChild(punkt);
+  });
 
   aktualisiereCarouselPunkte();
 }
 
+// Helfer: nur nicht-ausgeblendete Karten
+function sichtbareCarouselKarten() {
+  return Array.from(dom.carouselSpur.querySelectorAll('.carousel__karte'))
+    .filter((karte) => !karte.hidden);
+}
+
 function aktualisiereCarouselPunkte() {
   const spur = dom.carouselSpur;
-  const karten = spur.querySelectorAll('.carousel__karte');
-  const punkte = dom.carouselPunkte.querySelectorAll('.carousel__punkt');
+  const karten = sichtbareCarouselKarten();
+  let punkte = Array.from(dom.carouselPunkte.querySelectorAll('.carousel__punkt'));
+
+  if (!karten.length || punkte.length !== karten.length) {
+    baueCarouselPunkte();
+    punkte = Array.from(dom.carouselPunkte.querySelectorAll('.carousel__punkt'));
+  }
 
   // Karte, deren Mitte am nächsten an der viewport-Mitte liegt, gilt als aktiv
   const mitte = spur.scrollLeft + spur.clientWidth / 2;

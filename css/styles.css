@@ -302,17 +302,7 @@ a { color: var(--gold-hell); }
   line-height: 1.25;
   color: var(--gold-hell);
   text-shadow: 0 0 18px rgba(212, 175, 55, .55), 0 0 55px rgba(212, 175, 55, .3);
-}
-
-.sprach-overlay__text {
-  margin: 1.2rem 0 2.2rem;
-  color: var(--text-gedrempft);
-  font-size: 1.05rem;
-}
-
-.sprach-overlay__text em {
-  font-style: italic;
-  color: var(--gold-hell);
+  margin-bottom: 2.2rem;
 }
 
 .sprach-buttons {

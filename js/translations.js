@@ -17,8 +17,6 @@ const UEBERSETZUNGEN = {
   de: {
     // Sprach-Overlay
     overlay_titel: 'Mathilda’s 18ter Geburtstag',
-    overlay_u_text: 'Das Motto: <em>Studio 54</em> — wähle deine Sprache',
-    overlay_aria_klein: 'Sprache wählen',
 
     // Hero
     hero_titel: 'Studio 54 Night',
@@ -69,8 +67,6 @@ const UEBERSETZUNGEN = {
   en: {
     // Language overlay
     overlay_titel: 'Mathilda’s 18th Birthday',
-    overlay_u_text: 'The motto: <em>Studio 54</em> — choose your language',
-    overlay_aria_klein: 'Choose your language',
 
     // Hero
     hero_titel: 'Studio 54 Night',
@@ -121,8 +117,6 @@ const UEBERSETZUNGEN = {
   pl: {
     // Nakładka wyboru języka
     overlay_titel: '18. Urodziny Mathildy',
-    overlay_u_text: 'Motto: <em>Studio 54</em> — wybierz swój język',
-    overlay_aria_klein: 'Wybierz język',
 
     // Hero
     hero_titel: 'Noc Studio 54',
