@@ -310,12 +310,12 @@ function baueSterne() {
 /* ============================================================
    GLITZER-SPUR — Goldfunken folgen Finger/Cursor (Studio-54-Wow)
    ============================================================ */
-// Gedrosselt (max. 1 Partikel pro 40 ms, max. 48 gleichzeitig),
+// Gedrosselt (max. 1 Startpartikel pro 28 ms, max. 90 gleichzeitig),
 // damit Wischen/Scrollen nicht ausgebremst wird.
 let letzteGlitzerZeit = 0;
 let glitzerAnzahl    = 0;
-const GLITZER_MAX     = 48;
-const GLITZER_PAUSE_MS = 40;
+const GLITZER_MAX     = 90;
+const GLITZER_PAUSE_MS = 28;
 
 function initialisiereGlitzerSpur() {
   // prefers-reduced-motion respektieren: keine Partikel-Werfer
@@ -342,23 +342,36 @@ function baueGlitzer(x, y) {
   const jetz = Date.now();
   if (jetz - letzteGlitzerZeit < GLITZER_PAUSE_MS) return;
   letzteGlitzerZeit = jetz;
+
+  // Hauptfunke + oft 1-2 Begleitfunken (dichtere Spur)
+  baueFunke(x, y, Math.random() * 5 + 4);
+  if (Math.random() < 0.7) baueFunke(x + rndOff(), y + rndOff(), Math.random() * 4 + 3);
+  if (Math.random() < 0.35) baueFunke(x + rndOff(), y + rndOff(), Math.random() * 4 + 3);
+}
+
+// Zufalls-Versatz im Umkreis (für Begleitfunken rund um die Spur)
+function rndOff() {
+  return Math.random() * 40 - 20;
+}
+
+function baueFunke(x, y, groesse) {
+  if (glitzerAnzahl >= GLITZER_MAX) return;
   glitzerAnzahl++;
 
   const funke = document.createElement('span');
   funke.className = 'glitzer';
-  if (Math.random() < 0.3) funke.classList.add('glitzer--weiss');
+  if (Math.random() < 0.4) funke.classList.add('glitzer--weiss');
 
-  const groesse = Math.random() * 5 + 3;
   funke.style.width  = groesse + 'px';
   funke.style.height = groesse + 'px';
   funke.style.left = x + 'px';
   funke.style.top  = y + 'px';
 
   // Flug-Richtung/Dauer als CSS-Variablen (Zufallsdrift + Blitzen)
-  funke.style.setProperty('--dx', (Math.random() * 28 - 14) + 'px');
-  funke.style.setProperty('--dy', (Math.random() * 28 - 14) + 'px');
+  funke.style.setProperty('--dx', (Math.random() * 36 - 18) + 'px');
+  funke.style.setProperty('--dy', (Math.random() * 36 - 18) + 'px');
   funke.style.setProperty('--dreh', (Math.random() * 360) + 'deg');
-  funke.style.animationDuration = (Math.random() * 300 + 600) + 'ms';
+  funke.style.animationDuration = (Math.random() * 500 + 700) + 'ms';
 
   funke.addEventListener('animationend', () => {
     funke.remove();
