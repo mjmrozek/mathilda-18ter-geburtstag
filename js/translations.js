@@ -15,8 +15,7 @@ const UEBERSETZUNGEN = {
   /* DEUTSCH                                                     */
   /* ---------------------------------------------------------- */
   de: {
-    // Sprach-Overlay
-    overlay_titel: 'Mathilda’s 18ter Geburtstag',
+    // Sprach-Overlay (Titel steht statisch in der index.html — Name/Zahlen sind sprachneutral)
 
     // Hero
     hero_titel: 'Studio 54 Night',
@@ -64,8 +63,7 @@ const UEBERSETZUNGEN = {
   /* ENGLISH                                                     */
   /* ---------------------------------------------------------- */
   en: {
-    // Language overlay
-    overlay_titel: 'Mathilda’s 18th Birthday',
+    // Language overlay (title is language-neutral, lives in index.html)
 
     // Hero
     hero_titel: 'Studio 54 Night',
@@ -113,8 +111,7 @@ const UEBERSETZUNGEN = {
   /* POLSKI                                                      */
   /* ---------------------------------------------------------- */
   pl: {
-    // Nakładka wyboru języka
-    overlay_titel: '18. Urodziny Mathildy',
+    // Nakładka wyboru języka (tytuł jest neutralny językowo, żyje w index.html)
 
     // Hero
     hero_titel: 'Noc Studio 54',

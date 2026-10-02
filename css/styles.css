@@ -304,14 +304,14 @@ a { color: var(--gold-hell); }
   letter-spacing: .35em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: 1rem;
+  margin-bottom: .35rem;   /* eng an der Discokugel dran */
 }
 
 .sprach-overlay__titel {
   font-family: 'Monoton', cursive;
   font-weight: 400;
-  font-size: clamp(1.8rem, 7vw, 3.2rem);
-  line-height: 1.25;
+  font-size: clamp(2.4rem, 10vw, 4.4rem);
+  line-height: 1.08;
   color: var(--gold-hell);
   text-shadow: 0 0 18px rgba(212, 175, 55, .55), 0 0 55px rgba(212, 175, 55, .3);
   margin-bottom: 2.2rem;
