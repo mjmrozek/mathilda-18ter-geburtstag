@@ -57,13 +57,11 @@ function initialisiere() {
   dom.heroFigure      = document.getElementById('hero-figure');
   dom.heroBild        = document.getElementById('hero-bild');
   dom.videoContainer  = document.getElementById('video-hintergrund');
-  dom.carouselSpur    = document.getElementById('carousel-spur');
-  dom.carouselPunkte  = document.getElementById('carousel-punkte');
+  dom.galerieStapel   = document.getElementById('galerie-stapel');
 
   baueSterne();
   verdrahteSprachButtons();
   verdrahteAudioButtons();
-  initialisiereCarousel();
   initialisiereScrollReveal();
 
   // Start-Sprache festlegen: URL-Parameter ?lang=… schlägt localStorage
@@ -369,83 +367,13 @@ function baueSterne() {
 
 
 /* ============================================================
-   CAROUSEL — horizontales Scrollen (Swipe auf Mobil) + Punkte.
-   Sichtbar sind nur die 2 Karten der gewählten Sprache
-   (Filter in aktualisiereGalerieSprache()).
+   GALERIE — die 2 Einladungsbilder der gewählten Sprache,
+   groß übereinander gestapelt (kein Karussell).
    ============================================================ */
-function initialisiereCarousel() {
-  // Navigations-Punkte erzeugen (einmalig für alle sichtbaren Karten)
-  baueCarouselPunkte();
-
-  // Aktiven Punkt beim Scrollen bestimmen (entprellt)
-  let scrollTimeout = null;
-  dom.carouselSpur.addEventListener('scroll', () => {
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(aktualisiereCarouselPunkte, 80);
-  });
-}
-
-// Galerie auf die gewählte Sprache eingrenzen: Karten anderer
-// Sprachen ausblenden, Punkte neu aufbauen, scroll zurück zum Anfang.
+// Karten anderer Sprachen ausblenden (wird aus wendeSpracheAn() gerufen)
 function aktualisiereGalerieSprache(lang) {
-  dom.carouselSpur.querySelectorAll('.carousel__karte').forEach((karte) => {
+  dom.galerieStapel.querySelectorAll('.galerie__karte').forEach((karte) => {
     karte.hidden = karte.dataset.lang !== lang;
-  });
-  dom.carouselSpur.scrollTo({ left: 0 });
-  baueCarouselPunkte();
-}
-
-// Navigations-Punkte für alle aktuell sichtbaren Karten neu erzeugen
-function baueCarouselPunkte() {
-  dom.carouselPunkte.innerHTML = '';
-  const sichtbareKarten = sichtbareCarouselKarten();
-
-  sichtbareKarten.forEach((karte, index) => {
-    const punkt = document.createElement('button');
-    punkt.type = 'button';
-    punkt.className = 'carousel__punkt';
-    punkt.setAttribute('aria-label', 'Karte ' + (index + 1));
-    punkt.addEventListener('click', () => {
-      dom.carouselSpur.scrollTo({ left: karte.offsetLeft - dom.carouselSpur.offsetLeft, behavior: 'smooth' });
-    });
-    dom.carouselPunkte.appendChild(punkt);
-  });
-
-  aktualisiereCarouselPunkte();
-}
-
-// Helfer: nur nicht-ausgeblendete Karten
-function sichtbareCarouselKarten() {
-  return Array.from(dom.carouselSpur.querySelectorAll('.carousel__karte'))
-    .filter((karte) => !karte.hidden);
-}
-
-function aktualisiereCarouselPunkte() {
-  const spur = dom.carouselSpur;
-  const karten = sichtbareCarouselKarten();
-  let punkte = Array.from(dom.carouselPunkte.querySelectorAll('.carousel__punkt'));
-
-  if (!karten.length || punkte.length !== karten.length) {
-    baueCarouselPunkte();
-    punkte = Array.from(dom.carouselPunkte.querySelectorAll('.carousel__punkt'));
-  }
-
-  // Karte, deren Mitte am nächsten an der viewport-Mitte liegt, gilt als aktiv
-  const mitte = spur.scrollLeft + spur.clientWidth / 2;
-  let aktiv = 0;
-  let kleinsterAbstand = Infinity;
-
-  karten.forEach((karte, index) => {
-    const zentrum = karte.offsetLeft - spur.offsetLeft + karte.offsetWidth / 2;
-    const abstand = Math.abs(zentrum - mitte);
-    if (abstand < kleinsterAbstand) {
-      kleinsterAbstand = abstand;
-      aktiv = index;
-    }
-  });
-
-  punkte.forEach((punkt, index) => {
-    punkt.classList.toggle('carousel__punkt--aktiv', index === aktiv);
   });
 }
 

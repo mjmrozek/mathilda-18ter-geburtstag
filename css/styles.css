@@ -17,6 +17,10 @@
   --text-gedrempft:  #c9b98f;
   --glow:            0 0 14px rgba(212, 175, 55, .55), 0 0 40px rgba(212, 175, 55, .25);
   --radius:          18px;
+  /* Hintergrundvideo-Behandlung: schwarz-weiß + weich, damit
+     Einladungen/Texte darüber deutlicher hervorstehen.
+     Nachregeln? Nur hier ändern, z. B. blur(10px) oder grayscale(0). */
+  --video-filter: grayscale(1) blur(6px);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -180,7 +184,9 @@ a { color: var(--gold-hell); }
 
 .video-hintergrund--sichtbar { opacity: 1; }
 
-/* 16:9-Deckung auf jedem Bildschirm (klassische Cover-Mimik) */
+/* 16:9-Deckung auf jedem Bildschirm (klassische Cover-Mimik).
+   scale(1.15) gleicht den unscharfen Rand durch blur() aus
+   (sonst sähe man am Rand helle Schlieren). */
 .video-hintergrund iframe {
   position: absolute;
   top: 50%;
@@ -190,8 +196,10 @@ a { color: var(--gold-hell); }
   height: 56.25vw;
   min-height: 100vh;
   min-width: 177.78vh;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(1.15);
+  filter: var(--video-filter);
   pointer-events: none;
+  will-change: filter;
 }
 
 /* Schwarz/Gold-Verlauf über dem Video für Lesbarkeit */
@@ -221,24 +229,28 @@ a { color: var(--gold-hell); }
 /* ------------------------------------------------------------
    Sound-Button (fix, oben rechts) & Musik-Fallback
    ------------------------------------------------------------ */
+/* Groß, fix oben MITTIG – der primäre Musik-Schalter */
 .sound-button {
   position: fixed;
   top: max(14px, env(safe-area-inset-top));
-  right: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 50;
-  width: 52px;
-  height: 52px;
+  width: clamp(4.75rem, 16vw, 6.25rem);
+  height: clamp(4.75rem, 16vw, 6.25rem);
   border-radius: 50%;
-  font-size: 1.35rem;
+  font-size: clamp(2rem, 7vw, 2.6rem);
   color: var(--gold-hell);
   background: rgba(10, 7, 3, .65);
   border: 2px solid rgba(212, 175, 55, .75);
   box-shadow: var(--glow);
   backdrop-filter: blur(4px);
   transition: transform .2s ease, box-shadow .3s ease;
+  animation: puls-glow 2.6s ease-in-out infinite;
 }
 
-.sound-button:hover { transform: scale(1.08); box-shadow: 0 0 20px rgba(212, 175, 55, .8); }
+.sound-button:hover,
+.sound-button:focus-visible { transform: translateX(-50%) scale(1.08); box-shadow: 0 0 20px rgba(212, 175, 55, .8); }
 
 .musik-fallback {
   position: fixed;
@@ -499,63 +511,30 @@ a { color: var(--gold-hell); }
 }
 
 /* ------------------------------------------------------------
-   Galerie / Carousel
+   Galerie — die 2 Einladungsbilder der gewählten Sprache,
+   groß übereinander gestapelt (kein Karussell)
    ------------------------------------------------------------ */
-.galerie__hinweis {
-  text-align: center;
-  font-size: .8rem;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--text-gedrempft);
-  margin-bottom: 1.6rem;
+.galerie {
+  max-width: 52rem;          /* breiter als andere Sektionen: Karten groß */
+  padding-inline: .75rem;    /* mobil etwas mehr Platz ausnutzen */
 }
 
-.carousel { position: relative; }
-
-/* horizontale Scroll-Spur: natives Swipe-Verhalten mit Scroll-Snap */
-.carousel__spur {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding: 0 .3rem 1rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--gold-dunkel) transparent;
+.galerie__stapel {
+  display: grid;
+  gap: 1.8rem;
 }
 
-.carousel__karte {
-  flex: 0 0 min(86vw, 420px);
-  scroll-snap-align: center;
+.galerie__karte {
   border-radius: 14px;
   border: 1.5px solid rgba(212, 175, 55, .45);
   overflow: hidden;
-  box-shadow: 0 0 18px rgba(212, 175, 55, .2);
+  box-shadow:
+    0 0 18px rgba(212, 175, 55, .2),
+    0 0 50px rgba(212, 175, 55, .12);
   background: var(--schwarz-2);
 }
 
-.carousel__karte img { width: 100%; }
-
-.carousel__punkte {
-  display: flex;
-  justify-content: center;
-  gap: .5rem;
-  margin-top: .4rem;
-}
-
-.carousel__punkt {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(212, 175, 55, .3);
-  transition: background .3s ease, transform .3s ease;
-}
-
-.carousel__punkt--aktiv {
-  background: var(--gold-hell);
-  transform: scale(1.25);
-  box-shadow: 0 0 8px rgba(212, 175, 55, .8);
-}
+.galerie__karte img { width: 100%; }
 
 /* ------------------------------------------------------------
    Footer
@@ -608,7 +587,8 @@ a { color: var(--gold-hell); }
   html { scroll-behavior: auto; }
 
   .stern, .discokugel__kugel::before, .discokugel__kugel::after,
-  .sprach-button, .musik-fallback, .hero__bild, .hero__hinweis {
+  .sprach-button, .musik-fallback, .hero__bild, .hero__hinweis,
+  .sound-button {
     animation: none !important;
   }
 

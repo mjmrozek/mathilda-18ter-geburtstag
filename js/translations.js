@@ -44,7 +44,6 @@ const UEBERSETZUNGEN = {
 
     // Galerie
     galerie_ueberschrift: 'Die Einladungen',
-    galerie_hinweis: 'Wische zu den Seiten, um alle Karten zu sehen',
     galerie_alt_de_titel: 'Goldene Ticketkarte: Mathilda’s 18ter Geburtstag – Studio 54',
     galerie_alt_de_details: 'Einladungskarte auf Deutsch mit Datum, Uhrzeit, Ort und Dresscode',
     galerie_alt_en_titel: 'Golden ticket card: Mathilda’s 18th Birthday – Studio 54',
@@ -94,7 +93,6 @@ const UEBERSETZUNGEN = {
 
     // Gallery
     galerie_ueberschrift: 'The invitations',
-    galerie_hinweis: 'Swipe sideways to see all the cards',
     galerie_alt_de_titel: 'Golden ticket card: Mathilda’s 18th Birthday – Studio 54 (German)',
     galerie_alt_de_details: 'Invitation card in German with date, time, venue and dresscode',
     galerie_alt_en_titel: 'Golden ticket card: Mathilda’s 18th Birthday – Studio 54',
@@ -144,7 +142,6 @@ const UEBERSETZUNGEN = {
 
     // Galeria
     galerie_ueberschrift: 'Zaproszenia',
-    galerie_hinweis: 'Przesuń palcem, aby zobaczyć wszystkie karty',
     galerie_alt_de_titel: 'Złoty bilet: 18. Urodziny Mathildy – Studio 54 (niem.)',
     galerie_alt_de_details: 'Karta zaproszenia po niemiecku z datą, godziną, miejscem i dresscode’em',
     galerie_alt_en_titel: 'Złoty bilet: 18. Urodziny Mathildy – Studio 54 (ang.)',

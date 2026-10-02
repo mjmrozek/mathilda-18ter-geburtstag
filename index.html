@@ -135,35 +135,33 @@
       </div>
     </section>
 
-    <!-- ============ GALERIE / CAROUSEL ============ -->
+    <!-- ============ EINLADUNGEN (Galerie) ============ -->
     <section class="abschnitt galerie" id="galerie">
       <h2 class="abschnitt__titel reveal" data-i18n="galerie_ueberschrift">Die Einladungen</h2>
-      <p class="galerie__hinweis reveal" data-i18n="galerie_hinweis">Wische zu den Seiten, um alle Karten zu sehen</p>
 
-      <!-- Carousel: horizontales Scrollen mit Scroll-Snap = natives Swipe auf Mobil -->
-      <div class="carousel" id="carousel" tabindex="0">
-        <div class="carousel__spur" id="carousel-spur">
-          <!-- data-lang = Karte wird nur bei passender Sprachwahl angezeigt -->
-          <figure class="carousel__karte reveal" data-lang="de">
-            <img src="images/einladung_1_de.jpeg" alt="" data-i18n-alt="galerie_alt_de_titel" loading="lazy" decoding="async">
-          </figure>
-          <figure class="carousel__karte reveal" data-lang="de">
-            <img src="images/einladung_2_de.jpeg" alt="" data-i18n-alt="galerie_alt_de_details" loading="lazy" decoding="async">
-          </figure>
-          <figure class="carousel__karte reveal" data-lang="en" hidden>
-            <img src="images/einladung_1_en.jpeg" alt="" data-i18n-alt="galerie_alt_en_titel" loading="lazy" decoding="async">
-          </figure>
-          <figure class="carousel__karte reveal" data-lang="en" hidden>
-            <img src="images/einladung_2_en.jpeg" alt="" data-i18n-alt="galerie_alt_en_details" loading="lazy" decoding="async">
-          </figure>
-          <figure class="carousel__karte reveal" data-lang="pl" hidden>
-            <img src="images/einladung_1_pl.jpeg" alt="" data-i18n-alt="galerie_alt_pl_titel" loading="lazy" decoding="async">
-          </figure>
-          <figure class="carousel__karte reveal" data-lang="pl" hidden>
-            <img src="images/einladung_2_pl.jpeg" alt="" data-i18n-alt="galerie_alt_pl_details" loading="lazy" decoding="async">
-          </figure>
-        </div>
-        <div class="carousel__punkte" id="carousel-punkte" aria-hidden="true"></div>
+      <!-- Die 2 Karten der gewählten Sprache, groß übereinander gestapelt.
+           data-lang = Karte wird nur bei passender Sprachwahl angezeigt.
+           Auch ohne JS sichtbar (default: Deutsch) — die übrigen sind
+           zunächst ausgeblendet und werden von main.js geschaltet. -->
+      <div class="galerie__stapel" id="galerie-stapel">
+        <figure class="galerie__karte reveal" data-lang="de">
+          <img src="images/einladung_1_de.jpeg" alt="" data-i18n-alt="galerie_alt_de_titel" loading="lazy" decoding="async">
+        </figure>
+        <figure class="galerie__karte reveal" data-lang="de">
+          <img src="images/einladung_2_de.jpeg" alt="" data-i18n-alt="galerie_alt_de_details" loading="lazy" decoding="async">
+        </figure>
+        <figure class="galerie__karte reveal" data-lang="en" hidden>
+          <img src="images/einladung_1_en.jpeg" alt="" data-i18n-alt="galerie_alt_en_titel" loading="lazy" decoding="async">
+        </figure>
+        <figure class="galerie__karte reveal" data-lang="en" hidden>
+          <img src="images/einladung_2_en.jpeg" alt="" data-i18n-alt="galerie_alt_en_details" loading="lazy" decoding="async">
+        </figure>
+        <figure class="galerie__karte reveal" data-lang="pl" hidden>
+          <img src="images/einladung_1_pl.jpeg" alt="" data-i18n-alt="galerie_alt_pl_titel" loading="lazy" decoding="async">
+        </figure>
+        <figure class="galerie__karte reveal" data-lang="pl" hidden>
+          <img src="images/einladung_2_pl.jpeg" alt="" data-i18n-alt="galerie_alt_pl_details" loading="lazy" decoding="async">
+        </figure>
       </div>
     </section>
   </main>
