@@ -380,7 +380,11 @@ a { color: var(--gold-hell); }
 .sprach-button:hover,
 .sprach-button:focus-visible { transform: scale(1.07); }
 
-/* ---- Musik-Consent (Zwei-Klick-Lösung): Hinweis unter „Mit Musik feiern“ ---- */
+/* ---- Musik-Consent (Zwei-Klick-Lösung) ----
+   Die zwei Wahl-Buttons stehen IMMER übereinander */
+#musik-consent .sprach-buttons { flex-direction: column; }
+
+/* Hinweis unter „Mit Musik feiern“ */
 .consent-wahl {
   display: grid;
   justify-items: center;
