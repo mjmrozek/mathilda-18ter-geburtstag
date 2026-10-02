@@ -86,6 +86,7 @@ function initialisiere() {
   } else {
     // Erster Besuch: Sprach-Overlay zeigen, Sound-Button noch versteckt
     dom.sprachOverlay.hidden = false;
+    document.body.classList.add('overlay-offen'); // kein Scrollen über das Overlay hinweg
   }
 }
 
@@ -134,8 +135,9 @@ function verdrahteSprachButtons() {
   });
 }
 
-// Overlay ausblenden; Hero-Inhalt wird sichtbar
+// Overlay ausblenden; Hero-Inhalt wird sichtbar, Scrollen wieder frei
 function sprachOverlayVerstecken() {
+  document.body.classList.remove('overlay-offen');
   dom.sprachOverlay.classList.add('sprach-overlay--ausblenden');
   setTimeout(() => { dom.sprachOverlay.hidden = true; }, 600);
 }
@@ -143,9 +145,9 @@ function sprachOverlayVerstecken() {
 // Overlay wieder zeigen („↩ Zurück zur Sprachauswahl“);
 // die Musik läuft dabei einfach weiter
 function zeigeSprachAuswahl() {
+  document.body.classList.add('overlay-offen');
   dom.sprachOverlay.hidden = false;
   dom.sprachOverlay.classList.remove('sprach-overlay--ausblenden');
-  dom.sprachOverlay.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Alle Texte auf der Seite für die gewählte Sprache anwenden (ohne Reload).
@@ -303,7 +305,14 @@ function pruefeWiedergabe() {
 //   – schaltet ansonsten Ton an/aus
 function verdrahteAudioButtons() {
   dom.soundButton.addEventListener('click', () => {
-    if (!player) { starteMusik(); return; }
+    if (!player) {
+      starteMusik();
+      // Sofortiges Feedback: ab jetzt "offen" (falls der Start klemmt, greift
+      // der Fallback-Check nach 2 Sek.)
+      istStumm = false;
+      aktualisiereSoundButton();
+      return;
+    }
     if (istStumm) {
       player.unMute();
       player.setVolume(MUSIK_LAUTSTAERKE);
@@ -324,13 +333,17 @@ function verdrahteAudioButtons() {
   dom.sprachwahlButton.addEventListener('click', zeigeSprachAuswahl);
 }
 
-// Icon + aria-Label des Sound-Buttons aktualisieren
+// Icon + aria-Label des Sound-Buttons aktualisieren.
+// Durchgestrichen (🔇), solange KEINE Musik läuft oder stumm geschaltet ist;
+// offener Lautsprecher (🔊), sobald Ton zu hören ist.
 function aktualisiereSoundButton() {
   if (!dom.soundButton || dom.soundButton.hidden) return;
+  const lauft = !!player && !istStumm && !musikFehlgeschlagen;
+  const icon = lauft ? '🔊' : '🔇';
+  if (dom.soundButton.textContent !== icon) dom.soundButton.textContent = icon;
   const lang = document.documentElement.lang || 'de';
-  dom.soundButton.textContent = istStumm ? '🔇' : '🔊';
   dom.soundButton.setAttribute('aria-label',
-    uebersetzung(lang, istStumm ? 'sound_an_aria' : 'sound_aus_aria') || '');
+    uebersetzung(lang, lauft ? 'sound_aus_aria' : 'sound_an_aria') || '');
 }
 
 

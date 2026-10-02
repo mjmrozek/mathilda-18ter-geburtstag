@@ -38,6 +38,9 @@ body {
 
 img { max-width: 100%; height: auto; display: block; }
 
+/* Solange das Sprach-Overlay offen ist: kein Scrollen (kein Leerbalken) */
+body.overlay-offen { overflow: hidden; }
+
 button {
   font-family: inherit;
   cursor: pointer;
@@ -380,14 +383,15 @@ a { color: var(--gold-hell); }
 /* ------------------------------------------------------------
    Hero
    ------------------------------------------------------------ */
+/* Blockflow statt Vollhöhen-Grid: kompakt, Bild folgt direkt
+   unter den fixen Buttons oben (deshalb das großzügige top-padding). */
 .hero {
   position: relative;
   z-index: 5;
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
-  padding: 5rem 1rem 2rem;
   text-align: center;
+  padding:
+    calc(max(14px, env(safe-area-inset-top)) + clamp(4.75rem, 16vw, 6.25rem) + 3.9rem)
+    1rem 1.5rem;
 }
 
 .hero__bildeinbettung {
@@ -424,7 +428,7 @@ a { color: var(--gold-hell); }
   to   { opacity: 1; transform: scale(1);  filter: blur(0); }
 }
 
-.hero__texte { margin-top: 1.6rem; }
+.hero__texte { margin-top: 1.2rem; }
 
 .hero__titel {
   font-family: 'Monoton', cursive;
@@ -440,8 +444,8 @@ a { color: var(--gold-hell); }
 }
 
 .hero__hinweis {
-  margin-top: 2.2rem;
-  font-size: .78rem;
+  margin-top: 1.1rem;
+  font-size: .74rem;
   letter-spacing: .28em;
   text-transform: uppercase;
   color: var(--gold);
@@ -461,7 +465,7 @@ a { color: var(--gold-hell); }
   z-index: 5;
   max-width: 44rem;
   margin: 0 auto;
-  padding: 4rem 1.2rem;
+  padding: 2.2rem 1.2rem;
 }
 
 .abschnitt__titel {
@@ -471,7 +475,7 @@ a { color: var(--gold-hell); }
   text-align: center;
   color: var(--gold-hell);
   text-shadow: 0 0 14px rgba(212, 175, 55, .45);
-  margin-bottom: 2.2rem;
+  margin-bottom: 1.3rem;
 }
 
 /* ------------------------------------------------------------
@@ -481,13 +485,13 @@ a { color: var(--gold-hell); }
   background: rgba(20, 16, 10, .78);
   border: 1.5px solid rgba(212, 175, 55, .55);
   border-radius: var(--radius);
-  padding: 1.8rem 1.4rem;
-  margin-bottom: 1.6rem;
+  padding: 1.4rem 1.3rem;
+  margin-bottom: 1.2rem;
   backdrop-filter: blur(5px);
   box-shadow: 0 0 22px rgba(212, 175, 55, .12);
 }
 
-.ticket__liste { display: grid; gap: 1.2rem; }
+.ticket__liste { display: grid; gap: 1rem; }
 
 .ticket__zeile dt {
   font-size: .72rem;
@@ -515,7 +519,7 @@ a { color: var(--gold-hell); }
 .maps-link:hover { color: #fff3cf; }
 
 .ticket__hinweis {
-  margin-top: 1.4rem;
+  margin-top: 1rem;
   font-size: .9rem;
   color: var(--text-gedrempft);
 }
@@ -532,7 +536,7 @@ a { color: var(--gold-hell); }
 }
 
 .ticket__schlusssatz {
-  margin-top: 1.4rem;
+  margin-top: 1rem;
   font-style: italic;
   color: var(--gold-hell);
 }
@@ -548,7 +552,7 @@ a { color: var(--gold-hell); }
 
 .galerie__stapel {
   display: grid;
-  gap: 1.8rem;
+  gap: 1.3rem;
 }
 
 .galerie__karte {
@@ -570,7 +574,7 @@ a { color: var(--gold-hell); }
   position: relative;
   z-index: 5;
   text-align: center;
-  padding: 3rem 1.2rem calc(2.5rem + env(safe-area-inset-bottom));
+  padding: 2rem 1.2rem calc(2rem + env(safe-area-inset-bottom));
   font-size: .8rem;
   letter-spacing: .14em;
   color: var(--text-gedrempft);
