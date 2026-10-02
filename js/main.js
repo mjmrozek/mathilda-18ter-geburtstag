@@ -6,8 +6,10 @@
      2. Festes Menü oben (nie verschwindend): 🎵 Musik-Button
         und die zwei anderen Sprach-Buttons (z. B. English/Polski).
      3. 🎵-Klick = Einwilligung UND Nutzergeste in einem Klick:
-        ERST DANN baut die Seite eine YouTube-Verbindung
-        (iframe-API-Script + youtube-nocookie-iframe, dynamisch).
+        youtube-nocookie-iframe wird SOFORT in derselben Geste
+        eingesetzt (autoplay=1 → EIN Klick genügt, auch iPhone).
+        Das iframe-API-Script lädt parallel und attacht sich
+        später (Lautstärke-Steuerung).
      4. Fallback: klemmt der Start (besonders iPhone/Safari),
         bleibt der 🎵-Button sichtbar, bis Ton wirklich läuft.
         onError: Seite läuft ohne Musik weiter.
@@ -31,10 +33,9 @@ const MAPS_ZIEL = 'https://www.google.com/maps/search/?api=1&query=An+d.+Neuen+M
 /* ============================================================
    ZUSTAND
    ============================================================ */
-let player = null;               // YouTube-Player-Instanz (wird erst bei Bedarf erzeugt)
+let player = null;               // YouTube-Player-Instanz (attacht sich an den laufenden iframe)
 let ytApiBereit = false;         // Merker: IFrame-API geladen?
 let ytApiLaeuft  = false;        // Merker: API-Script wird gerade geladen (Doppelstart verhindern)
-let startAusstehend = false;     // Start-Wunsch, bevor die API bereit war (Start nachholen)
 let musikFehlgeschlagen = false; // onError → Seite läuft ohne Musik weiter
 
 // DOM-Referenzen (in initialisiere() gefüllt)
@@ -131,21 +132,37 @@ function uebersetzung(lang, schluessel) {
 
 /* ============================================================
    YOUTUBE — Musik als Vollbild-Hintergrund
+   ------------------------------------------------------------
+   1-Klick-Start: Der iframe wird SOFORT im 🎵-Klick eingesetzt
+   (Embed-URL mit autoplay=1). Nur so startet der Ton mit eben
+   DIESER Nutzergeste zuverlässig — die iframe-API ist erst
+   Sekunden später bereit, dann ist die Geste des Klicks schon
+   „verbraucht“ (deswegen musste man sonst ZWEIMAL klicken).
+   Die iframe-API lädt parallel und attacht sich danach an den
+   laufenden Player, damit Lautstärke & Musik-Status steuerbar
+   bleiben. Datenschutz: ERST der 🎵-Klick baut überhaupt die
+   erste YouTube-Verbindung (iframe + API-Script).
    ============================================================ */
 
-// Wird von der IFrame-API aufgerufen, sobald sie geladen ist
+// Wird von der IFrame-API aufgerufen, sobald sie geladen ist:
+// an den schon laufenden iframe „anchließen“ (attach, kein neuer Player)
 window.onYouTubeIframeAPIReady = function () {
   ytApiBereit = true;
-  // Falls schon ein Start gewünscht war, bevor die API fertig war:
-  if (startAusstehend) {
-    startAusstehend = false;
-    starteMusik();
+  const iframeEl = document.getElementById('yt-player-iframe');
+  if (!player && iframeEl && dom.videoContainer.classList.contains('video-hintergrund--sichtbar')) {
+    try {
+      player = new YT.Player(iframeEl, {
+        events: {
+          onReady: beiPlayerBereit,
+          onStateChange: beiStatuswechsel,
+          onError: beiPlayerFehler,
+        },
+      });
+    } catch (e) { /* attach nicht nötig — Musik läuft ggf. schon */ }
   }
 };
 
-// IFrame-API-Script DYNAMISCH nachladen — erst nach dem 🎵-Klick baut
-// die Seite überhaupt die erste YouTube-Verbindung (Datenschutz:
-// Datenkontakt via Script + iframe erst in diesem Moment).
+// IFrame-API-Script DYNAMISCH nachladen (nur nach dem 🎵-Klick)
 function ladeYoutubeApi() {
   if (ytApiBereit || ytApiLaeuft) return;
   ytApiLaeuft = true;
@@ -155,57 +172,69 @@ function ladeYoutubeApi() {
   document.head.appendChild(script);
 }
 
-// Player erzeugen + sofort abspielen (innerhalb der Nutzergeste!)
+// YouTube-iframe SOFORT (synchron in der Nutzergeste!) einsetzen:
+// autoplay=1 in der Embed-URL ist der Trick für den 1-Klick-Ton,
+// loop+playlist für die Dauerschleife, enablejsapi für das Attach.
+function baueYoutubeIframe() {
+  if (document.getElementById('yt-player-iframe')) return;
+
+  const params = new URLSearchParams({
+    autoplay: '1',        // direkt abspielen (mit Ton — siehe Klick-Geste)
+    mute: '0',            // MIT Ton starten
+    controls: '0',        // Bedienelemente verstecken
+    loop: '1',            // Dauerschleife
+    playlist: VIDEO_ID,   // nötig, damit loop funktioniert
+    playsinline: '1',     // mobil: inline statt im Fullscreen-Player
+    rel: '0',             // keine Video-Empfehlungen am Ende
+    modestbranding: '1',  // dezenteres YouTube-Branding
+    iv_load_policy: '3',  // keine Karten-Anmerkungen
+    disablekb: '1',       // Tastatursteuerung aus
+    fs: '0',              // kein Vollscreen-Button
+    enablejsapi: '1',     // nötig, damit sich die API attachen kann
+    origin: window.location.origin,
+  });
+
+  const iframe = document.createElement('iframe');
+  iframe.id = 'yt-player-iframe';
+  iframe.title = 'Musik — Bee Gees, More Than a Woman';
+  iframe.src = 'https://www.youtube-nocookie.com/embed/' + VIDEO_ID + '?' + params.toString();
+  iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+
+  dom.videoContainer.appendChild(iframe);
+}
+
+// 🎵-Klick = Einwilligung + Start (der iframe geht in DIESER Geste raus)
 function starteMusik() {
   if (musikFehlgeschlagen) return; // onError: ohne Musik weitermachen
-
-  if (!ytApiBereit) {
-    startAusstehend = true; // Start nachholen, sobald die API bereit ist
-    ladeYoutubeApi();
-    return;
-  }
 
   // Video-Layer langsam einblenden (schwarze Fläche → sichtbares Video)
   dom.videoContainer.classList.add('video-hintergrund--sichtbar');
 
+  // 1. iframe sofort einsetzen → Ton startet mit dieser Geste
+  baueYoutubeIframe();
+
+  // 2. iframe-API parallel laden → attacht sich, sobald bereit
+  ladeYoutubeApi();
+
+  // 3. API schon da & Player attached (z. B. erneuter 🎵-Klick):
+  //    dann direkt wieder/starten (hier gilt die FRISCHE Nutzergeste)
   if (player) {
-    // Player existiert schon (erneuter 🎵-Klick nach Pause o. ä.)
     player.setVolume(MUSIK_LAUTSTAERKE);
     player.playVideo();
-    pruefeWiedergabe();
-    return;
   }
-
-  player = new YT.Player('yt-player', {
-    videoId: VIDEO_ID,
-    host: 'https://www.youtube-nocookie.com', // Datenschutzmodus: keine Tracking-Cookies
-    playerVars: {
-      autoplay: 1,          // direkt abspielen
-      controls: 0,          // Bedienelemente verstecken
-      loop: 1,              // Dauerschleife
-      playlist: VIDEO_ID,   // nötig, damit loop mit der IFrame-API funktioniert
-      playsinline: 1,       // mobil: inline statt im Fullscreen-Player
-      rel: 0,               // keine Video-Empfehlungen am Ende
-      modestbranding: 1,    // dezenteres YouTube-Branding
-      iv_load_policy: 3,    // keine Karten-Anmerkungen
-      disablekb: 1,         // Tastatursteuerung aus
-      fs: 0,                // kein Vollscreen-Button
-      mute: 0,              // MIT Ton starten
-    },
-    events: {
-      onReady: beiPlayerBereit,
-      onStateChange: beiStatuswechsel,
-      onError: beiPlayerFehler,
-    },
-  });
 
   // Fallback: kommt innerhalb von 2 Sek. keine Wiedergabe, 🎵-Button sichtbar lassen
   pruefeWiedergabe();
 }
 
+// Attach fertig: Lautstärke setzen; läuft der Ton schon → Button/Hinweis weg
 function beiPlayerBereit(event) {
   event.target.setVolume(MUSIK_LAUTSTAERKE);
-  event.target.playVideo();
+  const YT = window.YT;
+  if (YT && event.target.getPlayerState() === YT.PlayerState.PLAYING) {
+    dom.musikButton.hidden = true;
+    dom.musikHinweis.hidden = true;
+  }
 }
 
 function beiStatuswechsel(event) {

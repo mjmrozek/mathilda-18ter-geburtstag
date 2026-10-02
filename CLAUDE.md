@@ -41,7 +41,7 @@ Implementiert in `initialisiere()` (main.js):
 1. **Jeder Aufruf:** sofort die **Einladungsseite auf Deutsch** — keine Sprach-Overlay-, keine Consent-Maske mehr (alte Overlays wurden komplett entfernt).
 2. **Festes Mini-Menü oben** (`.kopf`, fix, **nie weg**): 🎵-Musik-Button + die **zwei anderen** Sprach-Buttons (auf Deutsch → *English · Polski*, auf Englisch → *Deutsch · Polski*, auf Polnisch → *Deutsch · English*; geschaltet von `aktualisiereMenu()`). Sprach-Buttons stehen ALLE 3 statisch in der index.html, JS blendet nur die aktive aus.
 3. Unter dem 🎵-Button (Teil der fixen Leiste) der **IP/YouTube-Hinweis** + Google-Privacy-Link — zusammen mit dem Button ausblenden, sobald Musik läuft (bzw. bei onError).
-4. **🎵-Klick = Einwilligung UND Nutzergeste in einem Klick:** `starteMusik()` im selben Handler → `ladeYoutubeApi()` injiziert das iframe-API-Script, iframe von **youtube-nocookie.com**, `playVideo()` mit Ton (50 %), Dauerschleife. Klemmt der Start, bleibt der 🎵-Button sichtbar (2-Sek.-Check `pruefeWiedergabe()`); `onError` → Seite läuft ohne Musik weiter, Button verschwindet.
+4. **🎵-Klick = Einwilligung UND Nutzergeste in einem Klick:** `starteMusik()` setzt im selben Handler den **iframe SOFORT synchron** (Embed-URL mit `autoplay=1&mute=0`, youtube-nocookie.com, `enablejsapi=1&origin=...`) — nur so startet der Ton mit dieser EINEN Geste zuverlässig (Sonst-Fehler: 2 Klicks nötig, weil die API erst nach dem Klick bereit war). Parallel lädt `ladeYoutubeApi()` das iframe-API-Script und „attacht" sich per `new YT.Player(iframeEl)` an den laufenden iframe (Lautstärke 50 %, Status-Events). Klemmt der Start, bleibt der 🎵-Button sichtbar (2-Sek.-Check `pruefeWiedergabe()`); `onError` → Seite läuft ohne Musik weiter, Button verschwindet.
 5. **Sprachwechsel** per Menü-Knopf → `wendeSpracheAn()` tauscht alle Texte, Hero-Bild (`einladung_1_<lang>.jpeg`) und Galerie ohne Reload.
 6. **Kein localStorage mehr** — Sprache/Einwilligung werden nicht gespeichert; die Seite startet IMMER auf Deutsch.
 
@@ -58,7 +58,8 @@ Implementiert in `initialisiere()` (main.js):
 
 ## Datenschutz-Detail (Zwei-Klick-Lösung — wichtig!)
 
-- **Keine einzige YouTube-Verbindung vor Einwilligung:** Der statische `<script src="https://www.youtube.com/iframe_api">` ist NICHT in der index.html; `ladeYoutubeApi()` injiziert das Script dynamisch erst nach dem 🎵-Klick. iframe folgt danach mit `host: 'https://www.youtube-nocookie.com'` (Datenschutzmodus) — beides in `starteMusik()`.
+- **Keine einzige YouTube-Verbindung vor Einwilligung:** Der statische `<script src="https://www.youtube.com/iframe_api">` ist NICHT in der index.html. `starteMusik()` setzt beim 🎵-Klick den **iframe direkt manuell** (`/embed/<ID>?autoplay=1&mute=0` → youtube-nocookie.com, Datenschutzmodus) und lädt das API-Script parallel erst dann — beides nur nach dem Klick. WICHTIG bewahrt: der iframe-URL braucht `enablejsapi=1&origin=<origin>`, damit die API sich attachen kann.
+- **1-Klick-Ton:** Der iframe MUSS synchron in der Klick-Geste eingesetzt werden (autoplay=1). Nicht wieder auf das alte Muster (API erst laden → Player bauen → playVideo) zurückstellen — daraus resultierte der Doppelklick-Bug.
 - Einwilligung ist der 🎵-Klick selbst; die IP-Hinweis-Zeile (`.kopf-hinweis`, `musik_hinweis` + `datenschutz_link`) steht dauerhaft neben/unter dem 🎵-Button. Kein localStorage mehr nötig.
 - Footer-Credit in allen Sprachen: `footer_musik` (Bee Gees + Hinweis Datenübertragung an YouTube/Google).
 

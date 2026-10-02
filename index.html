@@ -50,12 +50,11 @@
     <div class="discokugel__kugel"></div>
   </div>
 
-  <!-- YouTube-Video als Vollbild-Hintergrund (iframe wird per JS ERST nach
-       dem Klick auf den 🎵-Musik-Button eingesetzt, youtube-nocookie.com;
-       pointer-events: none damit Scrollen/Antippen weiter funktioniert) -->
-  <div class="video-hintergrund" id="video-hintergrund" aria-hidden="true">
-    <div id="yt-player"></div>
-  </div>
+  <!-- YouTube-Video als Vollbild-Hintergrund (iframe wird per JS ERST beim
+       Klick auf den 🎵-Musik-Button eingesetzt — synchron in der Nutzergeste,
+       damit EIN Klick genügt; youtube-nocookie.com; pointer-events: none
+       damit Scrollen/Antippen weiter funktioniert) -->
+  <div class="video-hintergrund" id="video-hintergrund" aria-hidden="true"></div>
 
   <!-- Halbdunkler Schwarz/Gold-Verlauf über dem Video, damit Inhalte lesbar bleiben -->
   <div class="video-abdunkelung" aria-hidden="true"></div>
