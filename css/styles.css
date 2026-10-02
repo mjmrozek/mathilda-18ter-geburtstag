@@ -38,9 +38,6 @@ body {
 
 img { max-width: 100%; height: auto; display: block; }
 
-/* Solange das Sprach-Overlay offen ist: kein Scrollen (kein Leerbalken) */
-body.overlay-offen { overflow: hidden; }
-
 button {
   font-family: inherit;
   cursor: pointer;
@@ -154,14 +151,6 @@ a { color: var(--gold-hell); }
   to   { opacity: .95; transform: translateX(6%); }
 }
 
-/* Variante im Sprach-Overlay: groß, mittig oben */
-.discokugel--overlay {
-  position: relative;
-  margin: 0 auto .45rem;   /* eng an „Studio 54 Night" und den Rest drunter */
-  width: 130px;
-  height: 130px;
-}
-
 /* Variante als dezenter Seiten-Hintergrund */
 .discokugel--hintergrund {
   position: fixed;
@@ -230,209 +219,130 @@ a { color: var(--gold-hell); }
 }
 
 /* ------------------------------------------------------------
-   Sound-Button (fix, oben rechts) & Musik-Fallback
+   Festes Menü oben — 🎵 Musik + die zwei anderen Sprachen.
+   Nie sichtbar weg. Zeiger-Durchgriff: die Leiste selbst lässt
+   Scrollen unter ihr zu, nur die Buttons sind klickbar.
    ------------------------------------------------------------ */
-/* Schmaler Button fix oben MITTIG (↩ zurück zur Sprachauswahl) */
-.sprachwahl-button {
+.kopf {
   position: fixed;
-  top: max(14px, env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 50;
-  padding: .55rem 1.15rem;
+  display: grid;
+  justify-items: center;
+  gap: .25rem;
+  padding: calc(max(8px, env(safe-area-inset-top)) + .35rem) .6rem .4rem;
+  /* Lesbarkeits-Schwaden nach unten auslaufend */
+  background: linear-gradient(180deg,
+    rgba(10, 7, 3, .88) 0%,
+    rgba(10, 7, 3, .55) 72%,
+    transparent 100%);
+  pointer-events: none;
+}
+
+.kopf-menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .5rem;
+  pointer-events: auto;
+}
+
+/* Kleine Menü-Pills */
+.menu-button {
+  padding: .45rem .95rem;
   border-radius: 999px;
-  font-size: .82rem;
+  font-size: .8rem;
   font-weight: 600;
   letter-spacing: .08em;
   white-space: nowrap;
+}
+
+/* Sprach-Pills: dunkel/Goldrand */
+.sprach-button {
   color: var(--gold-hell);
   background: rgba(10, 7, 3, .65);
   border: 1.5px solid rgba(212, 175, 55, .6);
   box-shadow: 0 0 10px rgba(212, 175, 55, .25);
   backdrop-filter: blur(4px);
-  transition: color .2s ease, border-color .2s ease;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease;
 }
 
-.sprachwahl-button:hover,
-.sprachwahl-button:focus-visible { color: #fff3cf; border-color: var(--gold); }
+.sprach-button:hover,
+.sprach-button:focus-visible { color: #fff3cf; border-color: var(--gold); transform: scale(1.06); }
 
-/* Musik-Button: fix UNTEN mittig. Sichtbar, solange keine Musik läuft;
-   jeder Klick = Einwilligung + Nutzergeste zum Start. */
-.musik-button {
-  position: fixed;
-  bottom: calc(1.2rem + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 60;
-  padding: .95rem 1.9rem;
-  border-radius: 999px;
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: .06em;
-  white-space: nowrap;
+/* 🎵-Musik-Pill: gold hervorgehoben, Start = Einwilligung */
+.menu-button--musik {
   color: var(--schwarz);
   background: linear-gradient(135deg, var(--gold-hell), var(--gold) 55%, var(--gold-dunkel));
   border: 2px solid rgba(255, 240, 200, .85);
   box-shadow: var(--glow);
-  backdrop-filter: blur(4px);
   animation: puls-glow 2.6s ease-in-out infinite;
+  transition: transform .2s ease;
 }
 
-.musik-button:hover,
-.musik-button:focus-visible { transform: translateX(-50%) scale(1.07); }
+.menu-button--musik:hover,
+.menu-button--musik:focus-visible { transform: scale(1.07); }
 
 @keyframes puls-glow {
   0%, 100% { box-shadow: 0 0 14px rgba(212, 175, 55, .55), 0 0 40px rgba(212, 175, 55, .25); }
   50%      { box-shadow: 0 0 26px rgba(245, 217, 139, .9), 0 0 70px rgba(212, 175, 55, .5); }
 }
 
-/* ------------------------------------------------------------
-   Sprach-Overlay (zuerst sichtbar)
-   ------------------------------------------------------------ */
-.sprach-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  align-content: center;   /* wichtig: Zeilen (Kugel + Inhalt) NICHT auf volle Höhe strecken */
-  gap: 0;
-  padding: 2rem;
-  background:
-    radial-gradient(ellipse at 50% 30%, rgba(20, 16, 10, .55) 0%, rgba(10, 7, 3, .97) 70%),
-    var(--schwarz);
-  overflow: auto;
-  transition: opacity .6s ease;
-}
-
-.sprach-overlay--ausblenden { opacity: 0; pointer-events: none; }
-
-.sprach-overlay__inhalt {
-  max-width: 34rem;
+/* IP/YouTube-Hinweis zum 🎵-Button (Einwilligung = Klick auf ihn) */
+.kopf-hinweis {
+  pointer-events: auto;
+  max-width: 32rem;
   text-align: center;
-}
-
-.overlay-klein {
-  font-size: .8rem;
-  letter-spacing: .35em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: .35rem;   /* eng an der Discokugel dran */
-}
-
-.sprach-overlay__titel {
-  font-family: 'Monoton', cursive;
-  font-weight: 400;
-  font-size: clamp(2.4rem, 10vw, 4.4rem);
-  line-height: 1.08;
-  color: var(--gold-hell);
-  text-shadow: 0 0 18px rgba(212, 175, 55, .55), 0 0 55px rgba(212, 175, 55, .3);
-  margin-bottom: 2.2rem;
-}
-
-.sprach-buttons {
-  display: flex;
-  flex-direction: column;   /* mobil untereinander */
-  gap: 1rem;
-  align-items: center;
-}
-
-@media (min-width: 560px) {
-  .sprach-buttons { flex-direction: row; }
-}
-
-/* Große Studio-54-Sprachbuttons mit Puls-Glow */
-.sprach-button {
-  min-width: 9.5rem;
-  padding: .95rem 1.8rem;
-  border-radius: 999px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: .08em;
-  color: var(--schwarz);
-  background: linear-gradient(135deg, var(--gold-hell), var(--gold) 55%, var(--gold-dunkel));
-  border: 2px solid rgba(255, 240, 200, .75);
-  box-shadow: var(--glow);
-  transition: transform .2s ease;
-  animation: puls-glow 2.6s ease-in-out infinite;
-}
-
-.sprach-button:nth-child(2) { animation-delay: .45s; }
-.sprach-button:nth-child(3) { animation-delay: .9s; }
-
-.sprach-button:hover,
-.sprach-button:focus-visible { transform: scale(1.07); }
-
-/* ---- Musik-Consent (Zwei-Klick-Lösung) ----
-   Die zwei Wahl-Buttons stehen IMMER übereinander */
-#musik-consent .sprach-buttons { flex-direction: column; }
-
-/* Hinweis unter „Mit Musik feiern“ */
-.consent-wahl {
-  display: grid;
-  justify-items: center;
-  gap: .45rem;
-  max-width: 21rem;
-}
-
-.consent-hinweis {
-  font-size: .76rem;
-  line-height: 1.5;
-  text-align: center;
+  font-size: .64rem;
+  line-height: 1.45;
+  letter-spacing: .02em;
   color: var(--text-gedrempft);
 }
 
-.consent-privacy {
-  font-size: .72rem;
-  letter-spacing: .06em;
+.kopf-hinweis__link {
+  font-size: .62rem;
   color: var(--gold);
   text-decoration: underline;
+  white-space: nowrap;
 }
 
-.consent-privacy:hover { color: var(--gold-hell); }
+.kopf-hinweis__link:hover { color: var(--gold-hell); }
 
 /* ------------------------------------------------------------
    Hero
    ------------------------------------------------------------ */
-/* Blockflow statt Vollhöhen-Grid: kompakt, Bild folgt direkt
-   unter dem ↩-Button oben (deshalb das großzügige top-padding). */
+/* Blockflow: fixe Menüleiste oben → großzügiges top-padding
+   (Leistenhöhe + IP-Hinweis reichlich einkalkuliert). */
 .hero {
   position: relative;
   z-index: 5;
   text-align: center;
   padding:
-    calc(max(14px, env(safe-area-inset-top)) + 4.2rem)
+    calc(max(14px, env(safe-area-inset-top)) + 5.6rem)
     1rem 1.5rem;
 }
 
-.hero__bildeinbettung {
-  opacity: 0;
-  transform: scale(.9);
-  transition: opacity 1.4s ease, transform 1.4s ease;
-}
-
-.hero__bildeinbettung--sichtbar {
-  opacity: 1;
-  transform: scale(1);
-}
+.hero__figure { margin: 0 auto; }
 
 .hero__bild {
   width: min(92vw, 640px);
+  margin: 0 auto;
   border-radius: 14px;
   box-shadow:
     0 0 24px rgba(212, 175, 55, .5),
     0 0 70px rgba(212, 175, 55, .28),
     0 0 120px rgba(212, 175, 55, .18);
-  animation: hero-glow 4s ease-in-out infinite alternate;
+  /* Sanfte Einblendung beim Laden + wechselnder Glow */
+  animation: hero-einblenden 1.4s ease both,
+             hero-glow 4s ease-in-out 1.4s infinite alternate;
 }
 
 @keyframes hero-glow {
   from { filter: drop-shadow(0 0 6px rgba(212, 175, 55, .35)); }
   to   { filter: drop-shadow(0 0 18px rgba(245, 217, 139, .6)); }
 }
-
-/* Einblende-Keyframe: Glow + Scale + Fade */
-.hero__bild--einblenden { animation: hero-einblenden 1.4s ease both, hero-glow 4s ease-in-out 1.4s infinite alternate; }
 
 @keyframes hero-einblenden {
   from { opacity: 0; transform: scale(.9); filter: blur(6px); }
@@ -637,13 +547,12 @@ a { color: var(--gold-hell); }
   html { scroll-behavior: auto; }
 
   .stern, .discokugel__kugel::before, .discokugel__kugel::after,
-  .sprach-button, .musik-button, .hero__bild, .hero__hinweis {
+  .menu-button--musik, .hero__bild, .hero__hinweis {
     animation: none !important;
   }
 
   .reveal { opacity: 1; transform: none; transition: none; }
-  .hero__bildeinbettung { opacity: 1; transform: none; transition: none; }
-  .hero__bild--einblenden { animation: none; opacity: 1; }
+  .hero__bild { animation: none; opacity: 1; }
 }
 
 /* ------------------------------------------------------------
@@ -652,4 +561,5 @@ a { color: var(--gold-hell); }
 @media (min-width: 760px) {
   .ticket { padding: 2.2rem 2.4rem; }
   .abschnitt { padding: 5rem 1.5rem; }
+  .kopf-hinweis { font-size: .7rem; }
 }

@@ -2,6 +2,10 @@
 <!-- ============================================================
      Mathilda's 18ter Geburtstag — Studio 54 One-Pager
      Reines HTML/CSS/JS, kein Framework, mobile-first.
+     Einstieg: direkt die Einladungsseite auf Deutsch. Fix,
+     nie verschwindendes Mini-Menü oben: 🎵 Musik (Klick =
+     Einwilligung, YouTube wird erst DANN geladen) mit IP-Hinweis
+     und die zwei anderen Sprach-Buttons.
      Alle Texte leben in js/translations.js (de/en/pl),
      zentrale Einstellungen oben in js/main.js.
      ============================================================ -->
@@ -17,7 +21,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Mathilda's 18ter Geburtstag — Studio 54">
   <meta property="og:description" content="Einladung zu Mathildas 18. Geburtstag — Studio 54 Night, 23. Januar 2027, Moers-Kapellen.">
-  <meta property="og:image" content="images/einladung_1_de.jpeg">
+  <meta property="og:image" content="https://mathildas-18ter-geburtstag.netlify.app/images/einladung_1_de.jpeg">
   <meta property="og:locale" content="de_DE">
   <meta property="og:locale:alternate" content="en_US">
   <meta property="og:locale:alternate" content="pl_PL">
@@ -26,7 +30,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Mathilda's 18ter Geburtstag — Studio 54">
   <meta name="twitter:description" content="Einladung zu Mathildas 18. Geburtstag — Studio 54 Night, 23. Januar 2027, Moers-Kapellen.">
-  <meta name="twitter:image" content="images/einladung_1_de.jpeg">
+  <meta name="twitter:image" content="https://mathildas-18ter-geburtstag.netlify.app/images/einladung_1_de.jpeg">
 
   <!-- Google Fonts: Monoton (70er-Headlines) + Josefin Sans (lesbare Sekundärfont) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,7 +51,7 @@
   </div>
 
   <!-- YouTube-Video als Vollbild-Hintergrund (iframe wird per JS ERST nach
-       musikalischer Einwilligung eingesetzt, youtube-nocookie.com;
+       dem Klick auf den 🎵-Musik-Button eingesetzt, youtube-nocookie.com;
        pointer-events: none damit Scrollen/Antippen weiter funktioniert) -->
   <div class="video-hintergrund" id="video-hintergrund" aria-hidden="true">
     <div id="yt-player"></div>
@@ -56,66 +60,31 @@
   <!-- Halbdunkler Schwarz/Gold-Verlauf über dem Video, damit Inhalte lesbar bleiben -->
   <div class="video-abdunkelung" aria-hidden="true"></div>
 
-  <!-- Zurück-zur-Sprachauswahl-Button: fix oben mittig, Sprache wechselbar -->
-  <button type="button" class="sprachwahl-button" id="sprachwahl-button" data-i18n="sprachwahl_zurueck" hidden>↩ Zurück zur Sprachauswahl</button>
-
-  <!-- Musik-Button: fix unten mittig. Startet die Musik (jeder Klick =
-       Einwilligung). Ist sichtbar, solange KEINE Musik läuft
-       (Fallback nach blockiertem Autoplay UND „später starten“-Option). -->
-  <button type="button" class="musik-button" id="musik-button" data-i18n="musik_fallback" hidden>🎵 Musik starten</button>
-
-  <!-- ============ SPRACH-OVERLAY (zuerst sichtbar) ============ -->
-  <!-- hidden = Standard; initialisiere() blendet es für Erstbesucher ein -->
-  <section class="sprach-overlay" id="sprach-overlay" aria-label="Sprache wählen" hidden>
-    <div class="discokugel discokugel--overlay" aria-hidden="true">
-      <div class="discokugel__kugel"></div>
-    </div>
-
-    <div class="sprach-overlay__inhalt">
-      <p class="overlay-klein">✦ Studio 54 Night ✦</p>
-      <h1 class="sprach-overlay__titel">
-        Mathilda<br>
-        18<br>
-        Party
-      </h1>
-
-      <div class="sprach-buttons">
-        <button type="button" class="sprach-button" data-sprache="de" lang="de">Deutsch</button>
-        <button type="button" class="sprach-button" data-sprache="en" lang="en">English</button>
-        <button type="button" class="sprach-button" data-sprache="pl" lang="pl">Polski</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ MUSIK-CONSENT (Zwei-Klick-Lösung) ============ -->
-  <!-- Erscheint nach der Sprachauswahl. Erst der Klick auf „Mit Musik feiern"
-       (oder später der Sound-Button) ist die Einwilligung UND die Nutzergeste,
-       die das youtube-nocookie-iframe dynamisch einsetzt. -->
-  <section class="sprach-overlay" id="musik-consent" hidden>
-    <div class="discokugel discokugel--overlay" aria-hidden="true">
-      <div class="discokugel__kugel"></div>
-    </div>
-
-    <div class="sprach-overlay__inhalt">
-      <p class="overlay-klein">✦ Studio 54 Night ✦</p>
-      <h1 class="sprach-overlay__titel" data-i18n="consent_titel">Musik?</h1>
-
-      <div class="sprach-buttons">
-        <div class="consent-wahl">
-          <button type="button" class="sprach-button" id="consent-ja" data-i18n="consent_ja">🎉 Mit Musik feiern</button>
-          <p class="consent-hinweis" data-i18n="consent_hinweis">Beim Abspielen werden Daten wie deine IP-Adresse an YouTube/Google übertragen.</p>
-          <a class="consent-privacy" href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-i18n="consent_datenschutz">Google-Datenschutzerklärung</a>
-        </div>
-        <button type="button" class="sprach-button" id="consent-nein" data-i18n="consent_nein">✨ Ohne Musik weiter</button>
-      </div>
-    </div>
-  </section>
+  <!-- ============ FESTES MENÜ OBEN (nie weg) ============ -->
+  <!-- 🎵 = Einwilligung UND Nutzergeste in einem Klick: erst dieser Klick
+       baut die YouTube-Verbindung (iframe-API-Script + nocookie-iframe).
+       Sprach-Buttons: immer die ZWEI anderen Sprachen des Menüs. -->
+  <header class="kopf" id="kopf">
+    <nav class="kopf-menu" aria-label="Musik und Sprache" data-i18n-aria="menu_aria">
+      <button type="button" class="menu-button menu-button--musik" id="musik-button" data-i18n="musik_button">🎵 Musik</button>
+      <button type="button" class="menu-button sprach-button" data-sprache="de" lang="de" hidden>Deutsch</button>
+      <button type="button" class="menu-button sprach-button" data-sprache="en" lang="en">English</button>
+      <button type="button" class="menu-button sprach-button" data-sprache="pl" lang="pl">Polski</button>
+    </nav>
+    <p class="kopf-hinweis" id="musik-hinweis">
+      <span data-i18n="musik_hinweis">Musik: Bee Gees – „More Than a Woman“ (YouTube). Beim Abspielen werden Daten wie deine IP-Adresse an YouTube/Google übertragen.</span>
+      <a class="kopf-hinweis__link" href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-i18n="datenschutz_link">Datenschutzerklärung</a>
+    </p>
+  </header>
 
   <!-- ============ HERO ============ -->
+  <!-- Blockflow mit großzügigem padding-top: Platz für das fixe Menü oben. -->
   <header class="hero" id="hero">
-    <figure class="hero__bildeinbettung" id="hero-figure" hidden>
+    <figure class="hero__figure">
       <!-- Erstes Einladungsbild: Quelle wird je nach gewählter Sprache in main.js gesetzt -->
-      <img class="hero__bild" id="hero-bild" alt="" decoding="async">
+      <img class="hero__bild" id="hero-bild" src="images/einladung_1_de.jpeg"
+           alt="Einladung zum 18. Geburtstag von Mathilda im Studio-54-Stil"
+           data-i18n-alt="hero_bild_alt" decoding="async">
     </figure>
     <div class="hero__texte">
       <h2 class="hero__titel" data-i18n="hero_titel">Studio 54 Night</h2>
@@ -205,7 +174,7 @@
   </footer>
 
   <!-- YouTube IFrame API wird bewusst NICHT statisch geladen (Datenschutz!):
-       main.js fügt das Script erst nach musikalischer Einwilligung ein. -->
+       main.js fügt das Script erst nach dem 🎵-Klick (Einwilligung) ein. -->
 
   <script src="js/translations.js"></script>
   <script src="js/main.js"></script>

@@ -1,19 +1,16 @@
 /* ============================================================
    main.js — Logik für die Studio-54-Einladung
    ------------------------------------------------------------
-   Ablauf beim Seitenaufruf (Zwei-Klick-Lösung, datenschutzkonform):
-     1. Erst-Besuch: Nur das Sprach-Overlay ist sichtbar.
-     2. Sprach-Auswahl → Musik-Consent-Screen. KEINE YouTube-Verbindung
-        davor: iframe UND IFrame-API-Script werden erst nach
-        ausdrücklicher Einwilligung dynamisch geladen.
-     3. „Mit Musik feiern" = Einwilligung + Nutzergeste:
-        youtube-nocookie.com-iframe, Start MIT Ton, danach blendet
-        das Einladungsbild sanft ein. / „Ohne Musik weiter" → reine
-        CSS-Disco-Visuals; der 🎵-Musik-Button startet später
-        (jeder Klick darauf = Einwilligung).
-     4. Fallback: klemmt der Start, bleibt der 🎵-Musik-Button
-        (fix unten) sichtbar, bis Ton wirklich läuft.
-     5. Wieder-Besuch: kein Overlay, Musik startet NIE automatisch.
+   Ablauf beim Seitenaufruf:
+     1. Direkt die Einladungsseite — auf Deutsch, ohne Overlays.
+     2. Festes Menü oben (nie verschwindend): 🎵 Musik-Button
+        und die zwei anderen Sprach-Buttons (z. B. English/Polski).
+     3. 🎵-Klick = Einwilligung UND Nutzergeste in einem Klick:
+        ERST DANN baut die Seite eine YouTube-Verbindung
+        (iframe-API-Script + youtube-nocookie-iframe, dynamisch).
+     4. Fallback: klemmt der Start (besonders iPhone/Safari),
+        bleibt der 🎵-Button sichtbar, bis Ton wirklich läuft.
+        onError: Seite läuft ohne Musik weiter.
    ============================================================ */
 
 'use strict';
@@ -21,12 +18,9 @@
 /* ============================================================
    KONSTANTEN — zentrale Anpassungen ganz oben
    ============================================================ */
-const VIDEO_ID           = 'uQ9_MwZIaoc'; // Bee Gees – "More Than a Woman"
-const MUSIK_LAUTSTAERKE  = 50;            // Lautstärke in Prozent
-const FALLBACK_TIMEOUT_MS   = 2000;       // Wartezeit bis zum Musik-Fallback-Button
-const HERO_BILD_VERZOEGERUNG_MS = 1500;   // Verzögerung bis zum Hero-Bild-Einblenden
-const STORAGE_SCHLUESSEL = 'mathilda18_sprache';       // Sprachwahl
-const STORAGE_CONSENT    = 'mathilda18_musicConsent';  // Musik-Einwilligung ('ja' | 'nein')
+const VIDEO_ID          = 'uQ9_MwZIaoc'; // Bee Gees – "More Than a Woman"
+const MUSIK_LAUTSTAERKE = 50;            // Lautstärke in Prozent
+const FALLBACK_TIMEOUT_MS = 2000;        // Wartezeit bis zum Wiedergabe-Check
 
 // Google-Maps-Ziel für den Orts-Link
 const MAPS_ZIEL = 'https://www.google.com/maps/search/?api=1&query=An+d.+Neuen+M%C3%BChle+22%2C+47447+Moers-Kapellen';
@@ -37,13 +31,11 @@ const MAPS_ZIEL = 'https://www.google.com/maps/search/?api=1&query=An+d.+Neuen+M
 /* ============================================================
    ZUSTAND
    ============================================================ */
-let player = null;            // YouTube-Player-Instanz (wird erst bei Bedarf erzeugt)
-let ytApiBereit = false;      // Merker: IFrame-API geladen?
-let ytApiLaeuft  = false;     // Merker: API-Script wird gerade geladen (Doppelstart verhindern)
-let startAusstehend = false;  // Start-Wunsch, bevor die API bereit war (Start nachholen)
-let musikAktiv = false;       // Läuft gerade Ton?
+let player = null;               // YouTube-Player-Instanz (wird erst bei Bedarf erzeugt)
+let ytApiBereit = false;         // Merker: IFrame-API geladen?
+let ytApiLaeuft  = false;        // Merker: API-Script wird gerade geladen (Doppelstart verhindern)
+let startAusstehend = false;     // Start-Wunsch, bevor die API bereit war (Start nachholen)
 let musikFehlgeschlagen = false; // onError → Seite läuft ohne Musik weiter
-let heroBildGezeigt = false;  // Hero-Bild schon eingeblendet?
 
 // DOM-Referenzen (in initialisiere() gefüllt)
 const dom = {};
@@ -55,52 +47,20 @@ const dom = {};
 document.addEventListener('DOMContentLoaded', initialisiere);
 
 function initialisiere() {
-  dom.sprachOverlay   = document.getElementById('sprach-overlay');
-  dom.sprachButtons   = document.querySelectorAll('.sprach-button');
-  dom.musikButton     = document.getElementById('musik-button');
-  dom.sprachwahlButton = document.getElementById('sprachwahl-button');
-  dom.musikConsent    = document.getElementById('musik-consent');
-  dom.consentJa       = document.getElementById('consent-ja');
-  dom.consentNein     = document.getElementById('consent-nein');
-  dom.heroFigure      = document.getElementById('hero-figure');
-  dom.heroBild        = document.getElementById('hero-bild');
-  dom.videoContainer  = document.getElementById('video-hintergrund');
-  dom.galerieStapel   = document.getElementById('galerie-stapel');
+  dom.musikButton    = document.getElementById('musik-button');
+  dom.musikHinweis   = document.getElementById('musik-hinweis');
+  dom.sprachButtons  = document.querySelectorAll('.sprach-button');
+  dom.videoContainer = document.getElementById('video-hintergrund');
+  dom.heroBild       = document.getElementById('hero-bild');
+  dom.galerieStapel  = document.getElementById('galerie-stapel');
 
   baueSterne();
   verdrahteSprachButtons();
-  verdrahteConsentButtons();
-  verdrahteAudioButtons();
+  verdrahteMusikButton();
   initialisiereScrollReveal();
 
-  // Start-Sprache festlegen: URL-Parameter ?lang=… schlägt localStorage
-  const urlSprache = ladeSpracheAusUrl();
-  const gespeicherteSprache = urlSprache || ladeSpracheAusSpeicher();
-  const consent = ladeConsent();
-
-  if (gespeicherteSprache && consent) {
-    // Wieder-Besuch: direkt auf der Seite — KEIN Overlay, KEIN Musik-Autoplay
-    wendeSpracheAn(gespeicherteSprache);
-    starteSeite(true); // Hero-Bild sofort zeigen, Musik-Button zum Nachstarten bieten
-  } else if (gespeicherteSprache) {
-    // Sprache bekannt, Einwilligung aber noch offen (z. B. alte Version):
-    // direkt zum Consent-Screen (Sprach-Overlay wird übersprungen)
-    wendeSpracheAn(gespeicherteSprache);
-    zeigeConsentOverlay();
-  } else {
-    // Erster Besuch: Sprach-Overlay zeigen, Sound-Button noch versteckt
-    dom.sprachOverlay.hidden = false;
-    document.body.classList.add('overlay-offen'); // kein Scrollen über das Overlay hinweg
-  }
-}
-
-// Nach der Consent-Entscheidung: Buttons einsetzen + Hero-Bild einblenden.
-// Die Musik läuft schon, wenn „Mit Musik feiern" gewählt wurde; sonst startet
-// sie erst per „🎵 Musik starten"-Button (jeder Klick = Einwilligung).
-function starteSeite(heroSofort) {
-  dom.musikButton.hidden = false;      // solange keine Musik läuft sichtbar;
-  dom.sprachwahlButton.hidden = false; // verschwindet, sobald Ton zu hören ist
-  if (heroSofort) heroBildAnzeigen(); else heroBildVerzoegertZeigen();
+  // Startzustand: Deutsch (Buttons zeigen die zwei anderen Sprachen)
+  aktualisiereMenu('de');
 }
 
 
@@ -108,102 +68,22 @@ function starteSeite(heroSofort) {
    SPRACHSYSTEM
    ============================================================ */
 
-// URL-Parameter ?lang=de/en/pl auslesen
-function ladeSpracheAusUrl() {
-  try {
-    const param = new URLSearchParams(window.location.search).get('lang');
-    if (param && UEBERSETZUNGEN[param]) return param;
-  } catch (e) { /* URLSearchParams nicht verfügbar – ignorieren */ }
-  return null;
-}
-
-// Gespeicherte Sprache aus dem localStorage lesen (fehlerfest verpackt)
-function ladeSpracheAusSpeicher() {
-  try {
-    const wert = localStorage.getItem(STORAGE_SCHLUESSEL);
-    if (wert && UEBERSETZUNGEN[wert]) return wert;
-  } catch (e) { /* Speicher blockiert (z. B. Privater Modus) – ignorieren */ }
-  return null;
-}
-
-// Sprache im localStorage speichern
-function speichereSprache(lang) {
-  try { localStorage.setItem(STORAGE_SCHLUESSEL, lang); } catch (e) { /* ignorieren */ }
-}
-
-// Sprach-Buttons verdrahten: Sprache speichern + zum Musik-Consent-Screen.
-// (Die Musik startet hier bewusst NICHT mehr — Erst-Einwilligung kommt im
-// nächsten Schritt: „Mit Musik feiern" / „Ohne Musik weiter".)
+// Sprach-Buttons im Menü verdrahten: Sprache umschalten, ohne Reload
 function verdrahteSprachButtons() {
   dom.sprachButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const lang = button.dataset.sprache;
-      speichereSprache(lang);
-      sprachOverlayVerstecken();
       wendeSpracheAn(lang);
-      zeigeConsentOverlay();
+      aktualisiereMenu(lang);
     });
   });
 }
 
-// Musik-Einwilligung aus dem localStorage lesen: 'ja', 'nein' oder null
-function ladeConsent() {
-  try {
-    const wert = localStorage.getItem(STORAGE_CONSENT);
-    if (wert === 'ja' || wert === 'nein') return wert;
-  } catch (e) { /* Speicher blockiert – ignorieren */ }
-  return null;
-}
-
-// Musik-Einwilligung speichern ('ja' | 'nein')
-function speichereConsent(wert) {
-  try { localStorage.setItem(STORAGE_CONSENT, wert); } catch (e) { /* ignorieren */ }
-}
-
-// Consent-Screen zeigen (Scrollsperre an; Texte sind via data-i18n schon passend)
-function zeigeConsentOverlay() {
-  document.body.classList.add('overlay-offen');
-  dom.musikConsent.hidden = false;
-  dom.musikConsent.classList.remove('sprach-overlay--ausblenden');
-}
-
-// Consent-Screen schließen: Scroll wieder freigeben, Buttons einsetzen
-function schliesseConsent(heroSofort) {
-  document.body.classList.remove('overlay-offen');
-  dom.musikConsent.classList.add('sprach-overlay--ausblenden');
-  setTimeout(() => { dom.musikConsent.hidden = true; }, 600);
-  starteSeite(heroSofort);
-}
-
-// Die zwei Consent-Buttons verdrahten
-function verdrahteConsentButtons() {
-  dom.consentJa.addEventListener('click', () => {
-    // EINWILLIGUNG + NUTZERGESTE in einem Klick:
-    speichereConsent('ja');
-    schliesseConsent(false);     // Hero-Bild blendet nach dem Start sanft ein
-    starteMusik();               // direkt im Klick-Handler → Player mit Ton
+// Menü: die gewählte Sprache ausblenden, die zwei anderen zeigen
+function aktualisiereMenu(lang) {
+  dom.sprachButtons.forEach((button) => {
+    button.hidden = button.dataset.sprache === lang;
   });
-
-  dom.consentNein.addEventListener('click', () => {
-    // Ohne Musik weiterlaufen; Musik-Button startet später (Klick = Einwilligung)
-    speichereConsent('nein');
-    schliesseConsent(false);
-  });
-}
-
-// Overlay ausblenden; Hero-Inhalt wird sichtbar, Scrollen wieder frei
-function sprachOverlayVerstecken() {
-  document.body.classList.remove('overlay-offen');
-  dom.sprachOverlay.classList.add('sprach-overlay--ausblenden');
-  setTimeout(() => { dom.sprachOverlay.hidden = true; }, 600);
-}
-
-// Overlay wieder zeigen („↩ Zurück zur Sprachauswahl“);
-// die Musik läuft dabei einfach weiter
-function zeigeSprachAuswahl() {
-  document.body.classList.add('overlay-offen');
-  dom.sprachOverlay.hidden = false;
-  dom.sprachOverlay.classList.remove('sprach-overlay--ausblenden');
 }
 
 // Alle Texte auf der Seite für die gewählte Sprache anwenden (ohne Reload).
@@ -263,9 +143,9 @@ window.onYouTubeIframeAPIReady = function () {
   }
 };
 
-// IFrame-API-Script DYNAMISCH nachladen — erst nach musikalischer
-// Einwilligung baut die Seite überhaupt die erste YouTube-Verbindung
-// (Datenkontakt via Script + iframe erst in diesem Moment).
+// IFrame-API-Script DYNAMISCH nachladen — erst nach dem 🎵-Klick baut
+// die Seite überhaupt die erste YouTube-Verbindung (Datenschutz:
+// Datenkontakt via Script + iframe erst in diesem Moment).
 function ladeYoutubeApi() {
   if (ytApiBereit || ytApiLaeuft) return;
   ytApiLaeuft = true;
@@ -289,7 +169,7 @@ function starteMusik() {
   dom.videoContainer.classList.add('video-hintergrund--sichtbar');
 
   if (player) {
-    // Player existiert schon (z. B. über den Sound-Button erneut gestartet)
+    // Player existiert schon (erneuter 🎵-Klick nach Pause o. ä.)
     player.setVolume(MUSIK_LAUTSTAERKE);
     player.playVideo();
     pruefeWiedergabe();
@@ -319,11 +199,9 @@ function starteMusik() {
     },
   });
 
-  // Fallback: kommt innerhalb von 2 Sek. keine Wiedergabe, Helper-Button zeigen
+  // Fallback: kommt innerhalb von 2 Sek. keine Wiedergabe, 🎵-Button sichtbar lassen
   pruefeWiedergabe();
 }
-
-// (Warten auf die API übernimmt onYouTubeIframeAPIReady per Callback)
 
 function beiPlayerBereit(event) {
   event.target.setVolume(MUSIK_LAUTSTAERKE);
@@ -334,8 +212,8 @@ function beiStatuswechsel(event) {
   const YT = window.YT;
   if (!YT) return;
   if (event.data === YT.PlayerState.PLAYING) {
-    musikAktiv = true;
-    dom.musikButton.hidden = true;   // Musik läuft → Musik-Button nicht mehr nötig
+    dom.musikButton.hidden = true;   // Musik läuft → 🎵-Button im Menü weg
+    dom.musikHinweis.hidden = true;  // Hinweis gehört zum Button
   }
   // Schleife absichern: falls „loop" von YouTube ignoriert wird, von vorn starten
   if (event.data === YT.PlayerState.ENDED) {
@@ -345,13 +223,15 @@ function beiStatuswechsel(event) {
 }
 
 // onError des Videos: Seite läuft ohne Musik weiter (Discokugel + Glitzer),
-// Musik-Button ausblenden (Starten hätte keinen Erfolg).
+// 🎵-Button ausblenden (Starten hätte keinen Erfolg).
 function beiPlayerFehler() {
   musikFehlgeschlagen = true;
-  if (dom.musikButton) dom.musikButton.hidden = true;
+  dom.musikButton.hidden = true;
+  dom.musikHinweis.hidden = true;
 }
 
-// Prüft nach 2 Sekunden, ob wirklich Musik läuft; sonst Musik-Button zeigen
+// Prüft nach 2 Sekunden, ob wirklich Musik läuft; sonst 🎵-Button sichtbar
+// lassen (klemmender Start, besonders iPhone/Safari).
 function pruefeWiedergabe() {
   setTimeout(() => {
     if (musikFehlgeschlagen) return;
@@ -360,40 +240,14 @@ function pruefeWiedergabe() {
     // Zustand 1 (PLAYING) oder 3 (BUFFERING) heißt: Video ist unterwegs
     if (zustand !== 1 && zustand !== 3) {
       dom.musikButton.hidden = false;
+      dom.musikHinweis.hidden = false;
     }
   }, FALLBACK_TIMEOUT_MS);
 }
 
-// „🎵 Musik starten“ (fix unten) + „↩ Zurück zur Sprachauswahl“ verdrahten
-function verdrahteAudioButtons() {
-  dom.musikButton.addEventListener('click', () => {
-    // Jeder Start über diesen Button = musikalische Einwilligung
-    speichereConsent('ja');
-    starteMusik();   // falls der Start klemmt, bleibt der Button sichtbar
-  });
-
-  // „↩ Zurück zur Sprachauswahl“ → Overlay erneut öffnen (ohne Reload)
-  dom.sprachwahlButton.addEventListener('click', zeigeSprachAuswahl);
-}
-
-
-/* ============================================================
-   HERO-BILD — ca. 1,5 Sek. nach dem Start sanft einblenden
-   ============================================================ */
-function heroBildVerzoegertZeigen() {
-  if (heroBildGezeigt) return;
-  heroBildGezeigt = true;
-  setTimeout(() => heroBildAnzeigen(), HERO_BILD_VERZOEGERUNG_MS);
-}
-
-// Bild einblenden: Glow + Scale + Fade (CSS-Animation .hero__bild--einblenden)
-function heroBildAnzeigen() {
-  if (!dom.heroFigure) return;
-  if (dom.heroFigure.hidden) dom.heroFigure.hidden = false;
-  requestAnimationFrame(() => {
-    dom.heroFigure.classList.add('hero__bildeinbettung--sichtbar');
-    dom.heroBild.classList.add('hero__bild--einblenden');
-  });
+// 🎵-Musik-Button im Menü verdrahten (jeder Klick = Einwilligung + Start)
+function verdrahteMusikButton() {
+  dom.musikButton.addEventListener('click', starteMusik);
 }
 
 

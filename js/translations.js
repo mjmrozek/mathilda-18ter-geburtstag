@@ -15,7 +15,12 @@ const UEBERSETZUNGEN = {
   /* DEUTSCH                                                     */
   /* ---------------------------------------------------------- */
   de: {
-    // Sprach-Overlay (Titel steht statisch in der index.html — Name/Zahlen sind sprachneutral)
+    // Festes Menü oben
+    // (Buttons "Deutsch/English/Polski" stehen statisch in der index.html)
+    musik_button: '🎵 Musik',
+    menu_aria: 'Musik und Sprache',
+    musik_hinweis: 'Musik: Bee Gees – „More Than a Woman“ (YouTube). Beim Abspielen werden Daten wie deine IP-Adresse an YouTube/Google übertragen.',
+    datenschutz_link: 'Datenschutzerklärung',
 
     // Hero
     hero_titel: 'Studio 54 Night',
@@ -50,27 +55,20 @@ const UEBERSETZUNGEN = {
     galerie_alt_pl_titel: 'Złoty bilet: 18. Urodziny Mathildy – Studio 54',
     galerie_alt_pl_details: 'Karta zaproszenia po polsku z datą, godziną, miejscem i dresscode’em',
 
-    // Musik-/Sprachauswahl-Buttons
-    musik_fallback: '🎵 Musik starten',
-    sprachwahl_zurueck: '↩ Zurück zur Sprachauswahl',
-
     // Footer
     footer_text: 'Mit Liebe &amp; Glitzer gebastelt — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
     footer_musik: 'Musik: Bee Gees – More Than a Woman (YouTube) · Beim Abspielen: Datenübertragung an YouTube/Google',
-
-    // Musik-Consent (Zwei-Klick-Lösung)
-    consent_titel: 'Musik?',
-    consent_ja: '🎉 Mit Musik feiern',
-    consent_nein: '✨ Weiter ohne Musik',
-    consent_hinweis: 'Beim Abspielen werden Daten wie deine IP-Adresse an YouTube/Google übertragen.',
-    consent_datenschutz: 'Google-Datenschutzerklärung',
   },
 
   /* ---------------------------------------------------------- */
   /* ENGLISH                                                     */
   /* ---------------------------------------------------------- */
   en: {
-    // Language overlay (title is language-neutral, lives in index.html)
+    // Fixed top menu (language buttons are static in index.html)
+    musik_button: '🎵 Music',
+    menu_aria: 'Music and language',
+    musik_hinweis: 'Music: Bee Gees – “More Than a Woman” (YouTube). While playing, data such as your IP address is transmitted to YouTube/Google.',
+    datenschutz_link: 'Privacy policy',
 
     // Hero
     hero_titel: 'Studio 54 Night',
@@ -105,27 +103,20 @@ const UEBERSETZUNGEN = {
     galerie_alt_pl_titel: 'Golden ticket card: Mathilda’s 18th Birthday – Studio 54 (Polish)',
     galerie_alt_pl_details: 'Invitation card in Polish with date, time, venue and dresscode',
 
-    // Music / language buttons
-    musik_fallback: '🎵 Start the music',
-    sprachwahl_zurueck: '↩ Back to language selection',
-
     // Footer
     footer_text: 'Made with love &amp; glitter — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
     footer_musik: 'Music: Bee Gees – More Than a Woman (YouTube) · While playing: data is transferred to YouTube/Google',
-
-    // Music consent (two-click solution)
-    consent_titel: 'Music?',
-    consent_ja: '🎉 Celebrate with music',
-    consent_nein: '✨ Continue without music',
-    consent_hinweis: 'When playing, data such as your IP address is transmitted to YouTube/Google.',
-    consent_datenschutz: 'Google privacy policy',
   },
 
   /* ---------------------------------------------------------- */
   /* POLSKI                                                      */
   /* ---------------------------------------------------------- */
   pl: {
-    // Nakładka wyboru języka (tytuł jest neutralny językowo, żyje w index.html)
+    // Stałe menu u góry (przyciski języków żyją statycznie w index.html)
+    musik_button: '🎵 Muzyka',
+    menu_aria: 'Muzyka i język',
+    musik_hinweis: 'Muzyka: Bee Gees – „More Than a Woman” (YouTube). Podczas odtwarzania dane, takie jak Twój adres IP, są przesyłane do YouTube/Google.',
+    datenschutz_link: 'Polityka prywatności',
 
     // Hero
     hero_titel: 'Noc Studio 54',
@@ -160,19 +151,8 @@ const UEBERSETZUNGEN = {
     galerie_alt_pl_titel: 'Złoty bilet: 18. Urodziny Mathildy – Studio 54',
     galerie_alt_pl_details: 'Karta zaproszenia po polsku z datą, godziną, miejscem i dresscode’em',
 
-    // Muzyka / wybór języka
-    musik_fallback: '🎵 Włącz muzykę',
-    sprachwahl_zurueck: '↩ Powrót do wyboru języka',
-
     // Stopka
     footer_text: 'Zrobione z miłością i brokatem — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
     footer_musik: 'Muzyka: Bee Gees – More Than a Woman (YouTube) · Podczas odtwarzania: transfer danych do YouTube/Google',
-
-    // Zgoda na muzykę (rozwiązanie dwuetapowe)
-    consent_titel: 'Muzyka?',
-    consent_ja: '🎉 Świętujmy z muzyką',
-    consent_nein: '✨ Kontynuuj bez muzyki',
-    consent_hinweis: 'Podczas odtwarzania dane, takie jak Twój adres IP, są przesyłane do YouTube/Google.',
-    consent_datenschutz: 'Polityka prywatności Google',
   },
 };
