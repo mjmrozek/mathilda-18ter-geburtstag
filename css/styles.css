@@ -425,6 +425,24 @@ a { color: var(--gold-hell); }
   color: rgba(201, 185, 143, .75);
 }
 
+/* Credit-Zeile: ganz klein, dezent (Nutzer 2026-10-02) */
+.footer__credit {
+  margin-top: .4rem;
+  font-size: .55rem;
+  letter-spacing: .04em;
+}
+
+.footer__credit a {
+  color: rgba(201, 185, 143, .55);
+  text-decoration: none;
+}
+
+.footer__credit a:hover,
+.footer__credit a:focus-visible {
+  color: rgba(245, 217, 139, .8);
+  text-decoration: underline;
+}
+
 /* ------------------------------------------------------------
    Scroll-Reveal
    ------------------------------------------------------------ */

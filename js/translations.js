@@ -58,6 +58,7 @@ const UEBERSETZUNGEN = {
     // Footer
     footer_text: 'Mit Liebe &amp; Glitzer gebastelt — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
     footer_musik: 'Musik: Bee Gees – More Than a Woman (YouTube) · Beim Abspielen: Datenübertragung an YouTube/Google',
+    footer_credit: 'Erstellt durch Mrozek, IT-Solutions',
   },
 
   /* ---------------------------------------------------------- */
@@ -106,6 +107,7 @@ const UEBERSETZUNGEN = {
     // Footer
     footer_text: 'Made with love &amp; glitter — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
     footer_musik: 'Music: Bee Gees – More Than a Woman (YouTube) · While playing: data is transferred to YouTube/Google',
+    footer_credit: 'Created by Mrozek, IT-Solutions',
   },
 
   /* ---------------------------------------------------------- */
@@ -154,5 +156,6 @@ const UEBERSETZUNGEN = {
     // Stopka
     footer_text: 'Zrobione z miłością i brokatem — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
     footer_musik: 'Muzyka: Bee Gees – More Than a Woman (YouTube) · Podczas odtwarzania: transfer danych do YouTube/Google',
+    footer_credit: 'Stworzone przez Mrozek, IT-Solutions',
   },
 };
