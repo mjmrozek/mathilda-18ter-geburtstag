@@ -309,6 +309,8 @@ a { color: var(--gold-hell); }
   z-index: 100;
   display: grid;
   place-items: center;
+  align-content: center;   /* wichtig: Zeilen (Kugel + Inhalt) NICHT auf volle Höhe strecken */
+  gap: 0;
   padding: 2rem;
   background:
     radial-gradient(ellipse at 50% 30%, rgba(20, 16, 10, .55) 0%, rgba(10, 7, 3, .97) 70%),
