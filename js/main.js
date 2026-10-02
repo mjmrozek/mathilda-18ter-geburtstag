@@ -53,6 +53,7 @@ function initialisiere() {
   dom.sprachOverlay   = document.getElementById('sprach-overlay');
   dom.sprachButtons   = document.querySelectorAll('.sprach-button');
   dom.soundButton     = document.getElementById('sound-button');
+  dom.sprachwahlButton = document.getElementById('sprachwahl-button');
   dom.musikFallback   = document.getElementById('musik-fallback');
   dom.heroFigure      = document.getElementById('hero-figure');
   dom.heroBild        = document.getElementById('hero-bild');
@@ -79,6 +80,7 @@ function initialisiere() {
     // Erneuter Besuch: kein Overlay, Video NICHT automatisch starten
     wendeSpracheAn(gespeicherteSprache);
     dom.soundButton.hidden = false;
+    dom.sprachwahlButton.hidden = false;
     aktualisiereSoundButton();
     heroBildAnzeigen();
   } else {
@@ -123,7 +125,8 @@ function verdrahteSprachButtons() {
       speichereSprache(lang);
       sprachOverlayVerstecken();
       wendeSpracheAn(lang);
-      dom.soundButton.hidden = false;   // Sound-Button ab jetzt fix oben rechts
+      dom.soundButton.hidden = false;   // Sound-Button ab jetzt fix oben mittig
+      dom.sprachwahlButton.hidden = false;   // „Zurück zur Sprachauswahl“ auch
       aktualisiereSoundButton();
       starteMusik(); // playVideo() direkt im Klick-Handler → Browser erlaubt Ton
       heroBildVerzoegertZeigen();
@@ -135,6 +138,14 @@ function verdrahteSprachButtons() {
 function sprachOverlayVerstecken() {
   dom.sprachOverlay.classList.add('sprach-overlay--ausblenden');
   setTimeout(() => { dom.sprachOverlay.hidden = true; }, 600);
+}
+
+// Overlay wieder zeigen („↩ Zurück zur Sprachauswahl“);
+// die Musik läuft dabei einfach weiter
+function zeigeSprachAuswahl() {
+  dom.sprachOverlay.hidden = false;
+  dom.sprachOverlay.classList.remove('sprach-overlay--ausblenden');
+  dom.sprachOverlay.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Alle Texte auf der Seite für die gewählte Sprache anwenden (ohne Reload).
@@ -308,6 +319,9 @@ function verdrahteAudioButtons() {
     dom.musikFallback.hidden = true;
     starteMusik();
   });
+
+  // „↩ Zurück zur Sprachauswahl“ → Overlay erneut öffnen (ohne Reload)
+  dom.sprachwahlButton.addEventListener('click', zeigeSprachAuswahl);
 }
 
 // Icon + aria-Label des Sound-Buttons aktualisieren

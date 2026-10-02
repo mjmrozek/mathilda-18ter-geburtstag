@@ -154,7 +154,7 @@ a { color: var(--gold-hell); }
 /* Variante im Sprach-Overlay: groß, mittig oben */
 .discokugel--overlay {
   position: relative;
-  margin: 0 auto 1.5rem;
+  margin: 0 auto .45rem;   /* eng an „Studio 54 Night" und den Rest drunter */
   width: 130px;
   height: 130px;
 }
@@ -251,6 +251,31 @@ a { color: var(--gold-hell); }
 
 .sound-button:hover,
 .sound-button:focus-visible { transform: translateX(-50%) scale(1.08); box-shadow: 0 0 20px rgba(212, 175, 55, .8); }
+
+/* Schmaler Button direkt UNTER dem Sound-Button (fixe Positionierung,
+   deshalb rechnet top die Sound-Button-Höhe mit ein) */
+.sprachwahl-button {
+  position: fixed;
+  top: calc(max(14px, env(safe-area-inset-top)) + clamp(4.75rem, 16vw, 6.25rem) + .55rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: .55rem 1.15rem;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  white-space: nowrap;
+  color: var(--gold-hell);
+  background: rgba(10, 7, 3, .65);
+  border: 1.5px solid rgba(212, 175, 55, .6);
+  box-shadow: 0 0 10px rgba(212, 175, 55, .25);
+  backdrop-filter: blur(4px);
+  transition: color .2s ease, border-color .2s ease;
+}
+
+.sprachwahl-button:hover,
+.sprachwahl-button:focus-visible { color: #fff3cf; border-color: var(--gold); }
 
 .musik-fallback {
   position: fixed;

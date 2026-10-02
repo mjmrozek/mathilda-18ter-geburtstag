@@ -54,6 +54,7 @@ const UEBERSETZUNGEN = {
     musik_fallback: '🎵 Musik starten',
     sound_an_aria: 'Hintergrundmusik einschalten',
     sound_aus_aria: 'Hintergrundmusik ausschalten',
+    sprachwahl_zurueck: '↩ Zurück zur Sprachauswahl',
 
     // Footer
     footer_text: 'Mit Liebe &amp; Glitzer gebastelt — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
@@ -102,6 +103,7 @@ const UEBERSETZUNGEN = {
     musik_fallback: '🎵 Start the music',
     sound_an_aria: 'Turn on background music',
     sound_aus_aria: 'Turn off background music',
+    sprachwahl_zurueck: '↩ Back to language selection',
 
     // Footer
     footer_text: 'Made with love &amp; glitter — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
@@ -150,6 +152,7 @@ const UEBERSETZUNGEN = {
     musik_fallback: '🎵 Włącz muzykę',
     sound_an_aria: 'Włącz muzykę w tle',
     sound_aus_aria: 'Wyłącz muzykę w tle',
+    sprachwahl_zurueck: '↩ Powrót do wyboru języka',
 
     // Stopka
     footer_text: 'Zrobione z miłością i brokatem — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
