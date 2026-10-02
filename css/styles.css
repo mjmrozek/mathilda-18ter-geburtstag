@@ -74,6 +74,38 @@ a { color: var(--gold-hell); }
   50%      { opacity: .85; transform: scale(1); }
 }
 
+/* Goldfunken-Spur: Partikel folgen Finger/Cursor (per main.js erzeugt) */
+.glitzer-spur {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;   /* reine Deko — Taps/Scroll gehen durch */
+  z-index: 8;             /* über den Inhalten (z5), unter dem Menü (z50) */
+}
+
+/* Einzelner Funke: 4-zackiger Glitzerstern */
+.glitzer {
+  position: absolute;
+  background: var(--gold-hell);
+  clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+  filter: drop-shadow(0 0 4px rgba(245, 217, 139, .9));
+  animation: glitzer-flug .9s ease-out forwards;
+}
+
+/* gelegentlich ein weißer Funke — lebendigeres Mischgefärbt */
+.glitzer--weiss { background: #fff8e1; }
+
+@keyframes glitzer-flug {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) rotate(var(--dreh)) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--dreh)) scale(.2);
+  }
+}
+
 /* YouTube-Video als Vollbild-Hintergrund, Cover-Skalierung.
    pointer-events: none !! – sonst fängt ein Antippen den Player ab. */
 .video-hintergrund {
@@ -464,7 +496,7 @@ a { color: var(--gold-hell); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 
-  .stern, .menu-button--musik, .hero__bild, .hero__hinweis {
+  .stern, .glitzer, .menu-button--musik, .hero__bild, .hero__hinweis {
     animation: none !important;
   }
 

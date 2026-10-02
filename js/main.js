@@ -56,6 +56,7 @@ function initialisiere() {
   dom.galerieStapel  = document.getElementById('galerie-stapel');
 
   baueSterne();
+  initialisiereGlitzerSpur();
   verdrahteSprachButtons();
   verdrahteMusikButton();
   initialisiereScrollReveal();
@@ -303,6 +304,68 @@ function baueSterne() {
     stern.style.animationDelay    = (Math.random() * 6) + 's';
     container.appendChild(stern);
   }
+}
+
+
+/* ============================================================
+   GLITZER-SPUR — Goldfunken folgen Finger/Cursor (Studio-54-Wow)
+   ============================================================ */
+// Gedrosselt (max. 1 Partikel pro 40 ms, max. 48 gleichzeitig),
+// damit Wischen/Scrollen nicht ausgebremst wird.
+let letzteGlitzerZeit = 0;
+let glitzerAnzahl    = 0;
+const GLITZER_MAX     = 48;
+const GLITZER_PAUSE_MS = 40;
+
+function initialisiereGlitzerSpur() {
+  // prefers-reduced-motion respektieren: keine Partikel-Werfer
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const spur = document.createElement('div');
+  spur.className = 'glitzer-spur';
+  spur.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(spur);
+  dom.glitzerSpur = spur;
+
+  document.addEventListener('touchmove', (ereignis) => {
+    const touche = ereignis.touches[0];
+    if (touche) baueGlitzer(touche.clientX, touche.clientY);
+  }, { passive: true });
+
+  document.addEventListener('mousemove', (ereignis) => {
+    baueGlitzer(ereignis.clientX, ereignis.clientY);
+  }, { passive: true });
+}
+
+function baueGlitzer(x, y) {
+  if (glitzerAnzahl >= GLITZER_MAX) return;
+  const jetz = Date.now();
+  if (jetz - letzteGlitzerZeit < GLITZER_PAUSE_MS) return;
+  letzteGlitzerZeit = jetz;
+  glitzerAnzahl++;
+
+  const funke = document.createElement('span');
+  funke.className = 'glitzer';
+  if (Math.random() < 0.3) funke.classList.add('glitzer--weiss');
+
+  const groesse = Math.random() * 5 + 3;
+  funke.style.width  = groesse + 'px';
+  funke.style.height = groesse + 'px';
+  funke.style.left = x + 'px';
+  funke.style.top  = y + 'px';
+
+  // Flug-Richtung/Dauer als CSS-Variablen (Zufallsdrift + Blitzen)
+  funke.style.setProperty('--dx', (Math.random() * 28 - 14) + 'px');
+  funke.style.setProperty('--dy', (Math.random() * 28 - 14) + 'px');
+  funke.style.setProperty('--dreh', (Math.random() * 360) + 'deg');
+  funke.style.animationDuration = (Math.random() * 300 + 600) + 'ms';
+
+  funke.addEventListener('animationend', () => {
+    funke.remove();
+    glitzerAnzahl--;
+  });
+
+  dom.glitzerSpur.appendChild(funke);
 }
 
 
