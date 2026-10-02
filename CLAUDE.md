@@ -82,7 +82,7 @@ Implementiert in `initialisiere()` (main.js):
 
 ## Deployment-Stand & Git
 
-- **Netlify** live: **https://mathildas-18ter-geburtstag.netlify.app** (Deploy-Branch `main` = automatisches Deploy bei jedem Push). GitHub-Repo synchron; `main` = Deploy-Branch. Gitflow: direkt auf `main` committen + pushen (kein PR-Flow), deutsche Commit-Messages, mit `Co-Authored-By: Claude Code <noreply@anthropic.com>`.
+- **Netlify** live: **https://mathildas-18ter-geburtstag.netlify.app** (Deploy-Branch `main` = automatisches Deploy bei jedem Push). GitHub-Repo synchron; `main` = Deploy-Branch. **AB 2026-10-02: Der Nutzer committet und pusht SELBST — Claude ändert nur Dateien, niemals git commit/push.** (Alte Regel „direkt auf main committen" ist ungültig.)
 - `.gitignore`: `.DS_Store`, `/einladung_*.jpeg` im Wurzelverzeichnis (Nutzer-Originals = Kopien der images/), `.waylog/` (Session-Protokolle — nichts für GitHub!), `*.swp`.
 
 ## Lokal testen

@@ -291,10 +291,13 @@ function baueSterne() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!container) return;
 
-  const anzahl = 60;
+  // 110 Sterne, einzelne davon spürbar größer (Auge fällt drauf beim Scrollen)
+  const anzahl = 110;
   for (let i = 0; i < anzahl; i++) {
     const stern = document.createElement('span');
-    const groesse = Math.random() * 2 + 1;
+    const gross = Math.random() < 0.15;
+    const groesse = gross ? (Math.random() * 2.2 + 3) : (Math.random() * 1.6 + 1.2);
+    if (gross) stern.classList.add('stern--gross');
     stern.className = 'stern';
     stern.style.width  = groesse + 'px';
     stern.style.height = groesse + 'px';
@@ -310,12 +313,13 @@ function baueSterne() {
 /* ============================================================
    GLITZER-SPUR — Goldfunken folgen Finger/Cursor (Studio-54-Wow)
    ============================================================ */
-// Gedrosselt (max. 1 Startpartikel pro 28 ms, max. 90 gleichzeitig),
-// damit Wischen/Scrollen nicht ausgebremst wird.
+// Gedrosselt (max. 1 Startpartikel pro 15 ms, max. 150 gleichzeitig),
+// damit Wischen/Scrollen trotzdem flüssig bleibt — Partikel sind billig
+// (nur transform/opacity-Animation) und sterben nach ~1 s weg.
 let letzteGlitzerZeit = 0;
 let glitzerAnzahl    = 0;
-const GLITZER_MAX     = 90;
-const GLITZER_PAUSE_MS = 28;
+const GLITZER_MAX     = 150;
+const GLITZER_PAUSE_MS = 15;
 
 function initialisiereGlitzerSpur() {
   // prefers-reduced-motion respektieren: keine Partikel-Werfer
@@ -327,6 +331,12 @@ function initialisiereGlitzerSpur() {
   document.body.appendChild(spur);
   dom.glitzerSpur = spur;
 
+  // Tap/Touchstart: kleiner Burst um die Berührung (Wow auch ohne Wischen)
+  document.addEventListener('touchstart', (ereignis) => {
+    const touche = ereignis.touches[0];
+    if (touche) glitzerBurst(touche.clientX, touche.clientY, 8, 90);
+  }, { passive: true });
+
   document.addEventListener('touchmove', (ereignis) => {
     const touche = ereignis.touches[0];
     if (touche) baueGlitzer(touche.clientX, touche.clientY);
@@ -335,6 +345,17 @@ function initialisiereGlitzerSpur() {
   document.addEventListener('mousemove', (ereignis) => {
     baueGlitzer(ereignis.clientX, ereignis.clientY);
   }, { passive: true });
+
+  // Ambient-Funken: alle ~2,2 s glitzernt es von selbst irgendwo —
+  // damit zwischen zwei Swipes nicht Funkstille herrscht.
+  setInterval(() => {
+    glitzerBurst(
+      Math.random() * window.innerWidth,
+      Math.random() * window.innerHeight,
+      Math.random() * 4 + 3,
+      70
+    );
+  }, 2200);
 }
 
 function baueGlitzer(x, y) {
@@ -343,15 +364,28 @@ function baueGlitzer(x, y) {
   if (jetz - letzteGlitzerZeit < GLITZER_PAUSE_MS) return;
   letzteGlitzerZeit = jetz;
 
-  // Hauptfunke + oft 1-2 Begleitfunken (dichtere Spur)
-  baueFunke(x, y, Math.random() * 5 + 4);
-  if (Math.random() < 0.7) baueFunke(x + rndOff(), y + rndOff(), Math.random() * 4 + 3);
-  if (Math.random() < 0.35) baueFunke(x + rndOff(), y + rndOff(), Math.random() * 4 + 3);
+  // Hauptfunke + 1-3 Begleitfunken (dichte, breite Spur)
+  baueFunke(x, y, Math.random() * 6 + 6);
+  if (Math.random() < 0.9) baueFunke(x + rndOff(), y + rndOff(), Math.random() * 5 + 4);
+  if (Math.random() < 0.7) baueFunke(x + rndOff(), y + rndOff(), Math.random() * 5 + 4);
+  if (Math.random() < 0.4) baueFunke(x + rndOff(), y + rndOff(), Math.random() * 5 + 4);
 }
 
 // Zufalls-Versatz im Umkreis (für Begleitfunken rund um die Spur)
 function rndOff() {
-  return Math.random() * 40 - 20;
+  return Math.random() * 56 - 28;
+}
+
+// Mehrere Funken auf einmal im Umkreis von `radius` px um (x, y) —
+// für Tap-Bursts und zufällige Ambient-Funker.
+function glitzerBurst(x, y, anzahl, radius) {
+  for (let i = 0; i < anzahl; i++) {
+    baueFunke(
+      x + Math.random() * radius - radius / 2,
+      y + Math.random() * radius - radius / 2,
+      Math.random() * 6 + 4
+    );
+  }
 }
 
 function baueFunke(x, y, groesse) {
