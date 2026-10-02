@@ -17,10 +17,10 @@
   --text-gedrempft:  #c9b98f;
   --glow:            0 0 14px rgba(212, 175, 55, .55), 0 0 40px rgba(212, 175, 55, .25);
   --radius:          18px;
-  /* Hintergrundvideo-Behandlung: schwarz-weiß + weich, damit
-     Einladungen/Texte darüber deutlicher hervorstehen.
-     Nachregeln? Nur hier ändern, z. B. blur(10px) oder grayscale(0). */
-  --video-filter: grayscale(1) blur(6px);
+  /* Hintergrundvideo-Behandlung: leicht entsättigt + sanft weichgezeichnet
+     (Nutzer 2026-10-02: Video deutlicher erkennbar machen — vorher
+     grayscale(1) blur(6px); nur hier nachregeln, z. B. blur(4px). */
+  --video-filter: grayscale(.8) blur(2px);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -49,7 +49,7 @@ button {
 a { color: var(--gold-hell); }
 
 /* ------------------------------------------------------------
-   Hintergrund-Layer: Sterne, Discokugel, Video, Abdunkelung
+   Hintergrund-Layer: Sterne, Video, Abdunkelung
    ------------------------------------------------------------ */
 
 /* Sterne/Partikel (per JS erzeugt, span.stern) */
@@ -74,94 +74,6 @@ a { color: var(--gold-hell); }
   50%      { opacity: .85; transform: scale(1); }
 }
 
-/* Rotierende Glitzer-Discokugel */
-.discokugel {
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-}
-
-/* Aufhängeband */
-.discokugel::before {
-  content: '';
-  position: absolute;
-  top: -80px;
-  left: 50%;
-  width: 2px;
-  height: 80px;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, transparent, rgba(212, 175, 55, .6));
-}
-
-/* Kugel: Spiegelflächen via rotierendem Conic-Gradient + Glow */
-.discokugel__kugel {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .95) 0%,
-                    rgba(255, 224, 140, .55) 18%, rgba(120, 100, 40, .35) 45%,
-                    rgba(10, 7, 3, .7) 78%);
-  box-shadow:
-    0 0 25px rgba(212, 175, 55, .55),
-    0 0 70px rgba(212, 175, 55, .25),
-    inset -10px -14px 30px rgba(0, 0, 0, .65);
-}
-
-/* Spiegelkacheln: rotierender Streifen-Conic, verdeckt von der Kugelform */
-.discokugel__kugel::before {
-  content: '';
-  position: absolute;
-  inset: -35%;
-  background:
-    repeating-conic-gradient(from 0deg,
-      rgba(255, 244, 214, .5)  0deg 8deg,
-      rgba(90, 73, 25, .55)   8deg 16deg,
-      rgba(255, 230, 150, .4) 16deg 24deg,
-      rgba(20, 14, 4, .7)     24deg 32deg);
-  animation: kugel-rotation 14s linear infinite;
-  filter: brightness(1.1);
-}
-
-/* wanderndes Glitzerlicht auf der Kugel */
-.discokugel__kugel::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 25% 20%, rgba(255, 255, 255, .85) 0%,
-                    transparent 22%),
-    radial-gradient(circle at 78% 72%, rgba(255, 214, 110, .5) 0%,
-                    transparent 30%);
-  animation: kugel-glanz 6s ease-in-out infinite alternate;
-}
-
-@keyframes kugel-rotation {
-  from { transform: rotate(0turn); }
-  to   { transform: rotate(1turn); }
-}
-
-@keyframes kugel-glanz {
-  from { opacity: .45; transform: translateX(-6%); }
-  to   { opacity: .95; transform: translateX(6%); }
-}
-
-/* Variante als dezenter Seiten-Hintergrund */
-.discokugel--hintergrund {
-  position: fixed;
-  top: 10vh;
-  left: -70px;
-  width: 110px;
-  height: 110px;
-  opacity: .35;
-  z-index: 1;
-}
-
 /* YouTube-Video als Vollbild-Hintergrund, Cover-Skalierung.
    pointer-events: none !! – sonst fängt ein Antippen den Player ab. */
 .video-hintergrund {
@@ -177,8 +89,9 @@ a { color: var(--gold-hell); }
 .video-hintergrund--sichtbar { opacity: 1; }
 
 /* 16:9-Deckung auf jedem Bildschirm (klassische Cover-Mimik).
-   scale(1.15) gleicht den unscharfen Rand durch blur() aus
-   (sonst sähe man am Rand helle Schlieren). */
+   scale(1.08) gleicht den unscharfen Rand durch blur() aus
+   (sonst sähe man am Rand helle Schlieren) — kleiner als früher, damit
+   das Video mit weniger blur mehr Fläche zeigt (2026-10-02). */
 .video-hintergrund iframe {
   position: absolute;
   top: 50%;
@@ -188,7 +101,7 @@ a { color: var(--gold-hell); }
   height: 56.25vw;
   min-height: 100vh;
   min-width: 177.78vh;
-  transform: translate(-50%, -50%) scale(1.15);
+  transform: translate(-50%, -50%) scale(1.08);
   filter: var(--video-filter);
   pointer-events: none;
   will-change: filter;
@@ -201,12 +114,12 @@ a { color: var(--gold-hell); }
   pointer-events: none;
   z-index: 2;
   background:
-    radial-gradient(ellipse at 50% 18%, rgba(10, 7, 3, .10) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 18%, rgba(10, 7, 3, .06) 0%, transparent 55%),
     linear-gradient(180deg,
-      rgba(10, 7, 3, .30) 0%,
-      rgba(10, 7, 3, .55) 32%,
-      rgba(10, 7, 3, .78) 60%,
-      rgba(10, 7, 3, .93) 100%);
+      rgba(10, 7, 3, .18) 0%,
+      rgba(10, 7, 3, .38) 32%,
+      rgba(10, 7, 3, .62) 60%,
+      rgba(10, 7, 3, .90) 100%);
 }
 
 /* goldener Schein am oberen Rand der Abdunkelung */
@@ -504,19 +417,6 @@ a { color: var(--gold-hell); }
   overflow: hidden;
 }
 
-/* kleine, sehr dezente Kugel im Footer unten mittig */
-.footer__kugel {
-  top: auto;
-  bottom: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70px;
-  height: 70px;
-  opacity: .3;
-}
-
-.footer__kugel::before { display: none; } /* kein Aufhängeband im Footer */
-
 /* Musik-Credit + Datenschutzhinweis */
 .footer__musik {
   margin-top: .4rem;
@@ -546,8 +446,7 @@ a { color: var(--gold-hell); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 
-  .stern, .discokugel__kugel::before, .discokugel__kugel::after,
-  .menu-button--musik, .hero__bild, .hero__hinweis {
+  .stern, .menu-button--musik, .hero__bild, .hero__hinweis {
     animation: none !important;
   }
 

@@ -251,7 +251,7 @@ function beiStatuswechsel(event) {
   }
 }
 
-// onError des Videos: Seite läuft ohne Musik weiter (Discokugel + Glitzer),
+// onError des Videos: Seite läuft ohne Musik weiter (Sterne + Glitzer),
 // 🎵-Button ausblenden (Starten hätte keinen Erfolg).
 function beiPlayerFehler() {
   musikFehlgeschlagen = true;

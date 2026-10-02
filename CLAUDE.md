@@ -4,10 +4,10 @@ Zusammenfassung aus MEINER (Claude-)Sicht, Stand **2026-10-02 (Umstellung „ein
 
 ## Projekt
 
-One-Page-Geburtstagseinladung im **Studio-54-Stil** (Schwarz & Gold, Glitzer, Neon-Glow, 70er-Typografie). Reines **HTML/CSS/JS — kein Framework, kein Build-Tool, kein npm**. Die einzige Extern-Abhängigkeit außer Google Fonts ist YouTube, aber **einwilligungsabhängig** (siehe Zwei-Klick-Lösung).
+One-Page-Geburtstagseinladung im **Studio-54-Stil** (Schwarz & Gold, Glitzer, Neon-Glow, 70er-Typografie). Reines **HTML/CSS/JS — kein Framework, kein Build-Tool, kein npm**. Die einzige Extern-Abhängigkeit außer Google Fonts ist YouTube, aber **einwilligungsabhängig** (erst der 🎵-Musik-Klick baut die Verbindung — siehe »Datenschutz-Detail«).
 
 - **Mobile-first**: Die Seite wird per **WhatsApp** versendet → alles muss am Handy funktionieren (nativ Swipe/scrollen, safe-area-insets, 100svh beachten).
-- **Deploy:** **Netlify** — läuft laut Nutzer (2026-10-02) einwandfrei. Die konkrete Netlify-Domain ist mir unbekannt → siehe offene To-Dos.
+- **Deploy:** **Netlify**, live unter **https://mathildas-18ter-geburtstag.netlify.app** (verifiziert, 2026-10-02).
 - **Repo:** https://github.com/mjmrozek/mathilda-18ter-geburtstag (öffentlich, Konto `mjmrozek`, gh-CLI eingerichtet/authentifiziert)
 - **Arbeitsverhältnis mit dem Nutzer:** Deutsch. Er formuliert Anpassungen informell mündlich („der Abstand ist zu groß"); vorher verstehen, was er meint, dann klein & gezielt bauen.
 
@@ -51,12 +51,14 @@ Implementiert in `initialisiere()` (main.js):
 - **Festes Menü oben, das NIE verschwindet:** 🎵 Musik-Button + die zwei anderen Sprach-Buttons. Nicht fixieren an eine Position mit „auto-hide" o. ä.
 - **Sprach-Button-Labels:** „Deutsch", „English" (großes E, Rest klein — nicht ENGLISH!), „Polski". Menü zeigt immer nur die zwei NICHT gewählten.
 - **Musik-Button mit IP-Zusatz:** neben/am 🎵-Button steht der Hinweis (IP-Übertragung an YouTube/Google) + Google-Privacy-Link — der muss sichtbar bleiben, solange der 🎵-Button sichtbar ist.
+- **Hero-Bild sofort sichtbar** beim Seitenaufruf (kein verzögertes Einblenden — die alte 1,5-s-Verzögerung ist bewusst entfernt).
+- **Abstände bewusst KOMPAKT** (mehrere Nachbesserungen!) — nicht wieder auflockern.
 - **RSVP: KOMPLETT WEG als Modul** (Nutzer 2026-10-02). Der RSVP-Satz auf den Karten (Galerie-Bild 2) ist nur Info-Text.
 - **Galerie: KEIN Karussell** — die **2 Karten der gewählten Sprache groß übereinander gestapelt** (`data-lang`-Filter in `aktualisiereGalerieSprache()`), damit der Kartentext lesbar ist.
 - **Video-Behandlung:** schwarz-weiß + weichgezeichnet, damit Inhalte hervorstehen — als CSS-Variable `--video-filter` (styles.css, in `:root`), z. B. `grayscale(1) blur(6px)`; `scale(1.15)` am iframe gleicht blur-Ränder aus.
 - Musik **beginnt nie ohne explizite Nutzergeste** (Konservierungsregel für iOS/Safari + Datenschutz) — der 🎵-Klick ist diese Geste.
 
-## Datenschutz-Detail (Zwei-Klick-Lösung — wichtig!)
+## Datenschutz-Detail (🎵-Klick = Einwilligung — wichtig!)
 
 - **Keine einzige YouTube-Verbindung vor Einwilligung:** Der statische `<script src="https://www.youtube.com/iframe_api">` ist NICHT in der index.html. `starteMusik()` setzt beim 🎵-Klick den **iframe direkt manuell** (`/embed/<ID>?autoplay=1&mute=0` → youtube-nocookie.com, Datenschutzmodus) und lädt das API-Script parallel erst dann — beides nur nach dem Klick. WICHTIG bewahrt: der iframe-URL braucht `enablejsapi=1&origin=<origin>`, damit die API sich attachen kann.
 - **1-Klick-Ton:** Der iframe MUSS synchron in der Klick-Geste eingesetzt werden (autoplay=1). Nicht wieder auf das alte Muster (API erst laden → Player bauen → playVideo) zurückstellen — daraus resultierte der Doppelklick-Bug.
@@ -87,7 +89,12 @@ Implementiert in `initialisiere()` (main.js):
 
 `npx serve .` (oder `python3 -m http.server`) — **nicht** per Doppelklick auf index.html (file:// macht YouTube/Font-Verhalten unzuverlässig). Keine Testhelfer mehr nötig: Seite startet immer auf Deutsch, Musik nur per 🎵-Klick.
 
+## Erledigt, nur zur Erinnerung
+
+- **og:image / twitter:image auf absolute URL** umgestellt (index.html): `https://mathildas-18ter-geburtstag.netlify.app/images/einladung_1_de.jpeg` — nötig für die zuverlässige WhatsApp-Vorschau.
+- **Ein-Klick-Musikstart** (3. Session-Runde 2026-10-02): YouTube-iframe wird synchron in der 🎵-Klick-Geste eingesetzt, API attacht sich parallel — Doppelklick-Bug behoben.
+
 ## Offene To-Dos
 
-1. **og:image / twitter:image auf absolute URL** umstellen (index.html ~Zeile 20/29) — Netlify-Domain ist **https://mathildas-18ter-geburtstag.netlify.app**, also `https://mathildas-18ter-geburtstag.netlify.app/images/einladung_1_de.jpeg` eintragen (WhatsApp-Preview braucht absolute URL).
-2. Kein RSVP geplant (bewusst, 2026-10-02 entschieden).
+- Kein RSVP geplant (bewusst, 2026-10-02 entschieden) — main.js hält die Kommentarmarke `// RSVP: hier später einbauen`.
+- WhatsApp-Vorschau einmal an der Live-Domain prüfen (Bild + Titel), nachdem Netlify deployt hat.
