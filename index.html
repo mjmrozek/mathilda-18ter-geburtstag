@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     Mathilda's 18ter Geburtstag — Studio 54 One-Pager
+     Reines HTML/CSS/JS, kein Framework, mobile-first.
+     Alle Texte leben in js/translations.js (de/en/pl),
+     zentrale Einstellungen oben in js/main.js.
+     ============================================================ -->
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <title>Mathilda's 18ter Geburtstag — Studio 54</title>
+  <meta name="description" content="Einladung zu Mathildas 18. Geburtstag — Studio 54 Night, 23. Januar 2027, Moers-Kapellen. Seventies & Eighties Dresscode.">
+
+  <!-- Open Graph (og:image: vorerst relativer Pfad, nach Deploy absolute URL eintragen) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mathilda's 18ter Geburtstag — Studio 54">
+  <meta property="og:description" content="Einladung zu Mathildas 18. Geburtstag — Studio 54 Night, 23. Januar 2027, Moers-Kapellen.">
+  <meta property="og:image" content="images/einladung_de_titel.jpg">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:locale:alternate" content="pl_PL">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mathilda's 18ter Geburtstag — Studio 54">
+  <meta name="twitter:description" content="Einladung zu Mathildas 18. Geburtstag — Studio 54 Night, 23. Januar 2027, Moers-Kapellen.">
+  <meta name="twitter:image" content="images/einladung_de_titel.jpg">
+
+  <!-- Google Fonts: Monoton (70er-Headlines) + Josefin Sans (lesbare Sekundärfont) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Josefin+Sans:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%F0%9F%AA%A9%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+  <!-- Sterne/Partikel im Hintergrund (per JS befüllt) -->
+  <div class="sterne" id="sterne" aria-hidden="true"></div>
+
+  <!-- Dezente Discokugel im Seitenhintergrund -->
+  <div class="discokugel discokugel--hintergrund" aria-hidden="true">
+    <div class="discokugel__kugel"></div>
+  </div>
+
+  <!-- YouTube-Video als Vollbild-Hintergrund (iframe wird per JS eingesetzt,
+       pointer-events: none damit Scrollen/Antippen weiter funktioniert) -->
+  <div class="video-hintergrund" id="video-hintergrund" aria-hidden="true">
+    <div id="yt-player"></div>
+  </div>
+
+  <!-- Halbdunkler Schwarz/Gold-Verlauf über dem Video, damit Inhalte lesbar bleiben -->
+  <div class="video-abdunkelung" aria-hidden="true"></div>
+
+  <!-- 🔊/🔇-Button: fix oben rechts, schaltet (bzw. startet) die Hintergrundmusik -->
+  <button type="button" class="sound-button" id="sound-button" data-i18n-aria="sound_aus_aria" hidden>🔇</button>
+
+  <!-- Fallback-Button, falls der Browser den Autoplay-Ton blockiert -->
+  <button type="button" class="musik-fallback" id="musik-fallback" data-i18n="musik_fallback" hidden>🎵 Musik starten</button>
+
+  <!-- ============ SPRACH-OVERLAY (zuerst sichtbar) ============ -->
+  <!-- hidden = Standard; initialisiere() blendet es für Erstbesucher ein -->
+  <section class="sprach-overlay" id="sprach-overlay" aria-label="Sprache wählen" hidden>
+    <div class="discokugel discokugel--overlay" aria-hidden="true">
+      <div class="discokugel__kugel"></div>
+    </div>
+
+    <div class="sprach-overlay__inhalt">
+      <p class="overlay-klein">✦ Studio 54 Night ✦</p>
+      <h1 class="sprach-overlay__titel">Mathilda&rsquo;s 18ter Geburtstag</h1>
+      <p class="sprach-overlay__text" data-i18n="overlay_u_text">Das Motto: <em>Studio 54</em> — wähle deine Sprache</p>
+
+      <div class="sprach-buttons" data-i18n-aria="overlay_aria_klein">
+        <button type="button" class="sprach-button reveal-glow" data-sprache="de" lang="de">Deutsch</button>
+        <button type="button" class="sprach-button reveal-glow" data-sprache="en" lang="en">English</button>
+        <button type="button" class="sprach-button reveal-glow" data-sprache="pl" lang="pl">Polski</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero" id="hero">
+    <figure class="hero__bildeinbettung" id="hero-figure" hidden>
+      <!-- Erstes Einladungsbild: Quelle wird je nach gewählter Sprache in main.js gesetzt -->
+      <img class="hero__bild" id="hero-bild" alt="" decoding="async">
+    </figure>
+    <div class="hero__texte">
+      <h2 class="hero__titel" data-i18n="hero_titel">Studio 54 Night</h2>
+      <p class="hero__untertitel" data-i18n="hero_untertitel">Eine Nacht voller Glitzer &amp; Disco</p>
+      <p class="hero__hinweis" data-i18n="hero_hinweis">Nach unten scrollen für alle Details</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ DETAILS ============ -->
+    <section class="abschnitt details" id="details">
+      <h2 class="abschnitt__titel reveal" data-i18n="details_ueberschrift">Die Details</h2>
+
+      <div class="ticket reveal">
+        <dl class="ticket__liste">
+          <div class="ticket__zeile">
+            <dt data-i18n="label_datum">Datum</dt>
+            <dd data-i18n="value_datum">23. Januar 2027</dd>
+          </div>
+          <div class="ticket__zeile">
+            <dt data-i18n="label_uhrzeit">Uhrzeit</dt>
+            <dd data-i18n="value_uhrzeit">Ab 19:00 Uhr</dd>
+          </div>
+          <div class="ticket__zeile">
+            <dt data-i18n="label_ort">Ort</dt>
+            <dd>
+              <span data-i18n="value_ort">An d. Neuen Mühle 22</span><br>
+              <span data-i18n="value_ort_zusatz">47447 Moers-Kapellen</span><br>
+              <!-- Verlinkung zu Google Maps -->
+              <a class="maps-link" target="_blank" rel="noopener"
+                 href="https://www.google.com/maps/search/?api=1&amp;query=An+d.+Neuen+M%C3%BChle+22%2C+47447+Moers-Kapellen"
+                 data-i18n="maps_linktext">In Google Maps öffnen</a>
+            </dd>
+          </div>
+          <div class="ticket__zeile">
+            <dt data-i18n="label_dresscode">Dresscode</dt>
+            <dd data-i18n="value_dresscode">Studio 54 — Seventies &amp; Eighties</dd>
+          </div>
+        </dl>
+        <p class="ticket__hinweis" data-i18n="dresscode_hinweis">Bei Fragen zum Dresscode kannst du dich jederzeit gerne bei mir melden.</p>
+      </div>
+
+      <div class="ticket ticket--rsvp reveal">
+        <h3 class="ticket__rsvp-titel" data-i18n="rsvp_ueberschrift">RSVP bis zum 15. Oktober</h3>
+        <p class="ticket__hinweis" data-i18n="rsvp_text">Bitte gib mir bis dahin Bescheid, ob du dabei bist…</p>
+        <p class="ticket__hinweis" data-i18n="unterkunft_hinweis">Bei Fragen zu einer Unterkunft…</p>
+        <p class="ticket__schlusssatz" data-i18n="schlusssatz">Ich freue mich darauf, mit euch eine ganz besondere Nacht zu feiern!</p>
+      </div>
+    </section>
+
+    <!-- ============ GALERIE / CAROUSEL ============ -->
+    <section class="abschnitt galerie" id="galerie">
+      <h2 class="abschnitt__titel reveal" data-i18n="galerie_ueberschrift">Die Einladungen</h2>
+      <p class="galerie__hinweis reveal" data-i18n="galerie_hinweis">Wische zu den Seiten, um alle Karten zu sehen</p>
+
+      <!-- Carousel: horizontales Scrollen mit Scroll-Snap = natives Swipe auf Mobil -->
+      <div class="carousel" id="carousel" tabindex="0">
+        <div class="carousel__spur" id="carousel-spur">
+          <figure class="carousel__karte reveal">
+            <img src="images/einladung_de_titel.jpg" alt="" data-i18n-alt="galerie_alt_de_titel" loading="lazy" decoding="async">
+          </figure>
+          <figure class="carousel__karte reveal">
+            <img src="images/einladung_de_details.jpg" alt="" data-i18n-alt="galerie_alt_de_details" loading="lazy" decoding="async">
+          </figure>
+          <figure class="carousel__karte reveal">
+            <img src="images/einladung_en_titel.jpg" alt="" data-i18n-alt="galerie_alt_en_titel" loading="lazy" decoding="async">
+          </figure>
+          <figure class="carousel__karte reveal">
+            <img src="images/einladung_en_details.jpg" alt="" data-i18n-alt="galerie_alt_en_details" loading="lazy" decoding="async">
+          </figure>
+          <figure class="carousel__karte reveal">
+            <img src="images/einladung_pl_titel.jpg" alt="" data-i18n-alt="galerie_alt_pl_titel" loading="lazy" decoding="async">
+          </figure>
+          <figure class="carousel__karte reveal">
+            <img src="images/einladung_pl_details.jpg" alt="" data-i18n-alt="galerie_alt_pl_details" loading="lazy" decoding="async">
+          </figure>
+        </div>
+        <div class="carousel__punkte" id="carousel-punkte" aria-hidden="true"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="discokugel discokugel--hintergrund footer__kugel" aria-hidden="true"></div>
+    <p data-i18n="footer_text">Mit Liebe &amp; Glitzer gebastelt</p>
+  </footer>
+
+  <!-- YouTube IFrame API (lädt asynchron, Callback: onYouTubeIframeAPIReady in main.js) -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script src="js/translations.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

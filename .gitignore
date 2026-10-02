@@ -1,0 +1,11 @@
+# macOS-Systemdateien
+.DS_Store
+
+# WhatsApp-Originalbilder (1:1-Kopien der Dateien in images/)
+# Wer sie ins Repo will: einfach die nächsten Zeilen löschen
+WhatsApp Image *.jpeg
+
+# Editor-Kram
+*.swp
+# Sitzungs-/Gesprächsprotokolle (nichts für GitHub)
+.waylog/
