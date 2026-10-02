@@ -380,6 +380,30 @@ a { color: var(--gold-hell); }
 .sprach-button:hover,
 .sprach-button:focus-visible { transform: scale(1.07); }
 
+/* ---- Musik-Consent (Zwei-Klick-Lösung): Hinweis unter „Mit Musik feiern“ ---- */
+.consent-wahl {
+  display: grid;
+  justify-items: center;
+  gap: .45rem;
+  max-width: 21rem;
+}
+
+.consent-hinweis {
+  font-size: .76rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text-gedrempft);
+}
+
+.consent-privacy {
+  font-size: .72rem;
+  letter-spacing: .06em;
+  color: var(--gold);
+  text-decoration: underline;
+}
+
+.consent-privacy:hover { color: var(--gold-hell); }
+
 /* ------------------------------------------------------------
    Hero
    ------------------------------------------------------------ */
@@ -595,6 +619,14 @@ a { color: var(--gold-hell); }
 }
 
 .footer__kugel::before { display: none; } /* kein Aufhängeband im Footer */
+
+/* Musik-Credit + Datenschutzhinweis */
+.footer__musik {
+  margin-top: .4rem;
+  font-size: .7rem;
+  letter-spacing: .04em;
+  color: rgba(201, 185, 143, .75);
+}
 
 /* ------------------------------------------------------------
    Scroll-Reveal

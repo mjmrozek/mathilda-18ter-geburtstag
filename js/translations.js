@@ -58,6 +58,14 @@ const UEBERSETZUNGEN = {
 
     // Footer
     footer_text: 'Mit Liebe &amp; Glitzer gebastelt — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
+    footer_musik: 'Musik: Bee Gees – More Than a Woman (YouTube) · Beim Abspielen: Datenübertragung an YouTube/Google',
+
+    // Musik-Consent (Zwei-Klick-Lösung)
+    consent_titel: 'Musik?',
+    consent_ja: '🎉 Mit Musik feiern',
+    consent_nein: '✨ Weiter ohne Musik',
+    consent_hinweis: 'Beim Abspielen werden Daten wie deine IP-Adresse an YouTube/Google übertragen.',
+    consent_datenschutz: 'Google-Datenschutzerklärung',
   },
 
   /* ---------------------------------------------------------- */
@@ -107,6 +115,14 @@ const UEBERSETZUNGEN = {
 
     // Footer
     footer_text: 'Made with love &amp; glitter — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
+    footer_musik: 'Music: Bee Gees – More Than a Woman (YouTube) · While playing: data is transferred to YouTube/Google',
+
+    // Music consent (two-click solution)
+    consent_titel: 'Music?',
+    consent_ja: '🎉 Celebrate with music',
+    consent_nein: '✨ Continue without music',
+    consent_hinweis: 'When playing, data such as your IP address is transmitted to YouTube/Google.',
+    consent_datenschutz: 'Google privacy policy',
   },
 
   /* ---------------------------------------------------------- */
@@ -156,5 +172,13 @@ const UEBERSETZUNGEN = {
 
     // Stopka
     footer_text: 'Zrobione z miłością i brokatem — Studio 54 Night · 23.01.2027 · Moers-Kapellen',
+    footer_musik: 'Muzyka: Bee Gees – More Than a Woman (YouTube) · Podczas odtwarzania: transfer danych do YouTube/Google',
+
+    // Zgoda na muzykę (rozwiązanie dwuetapowe)
+    consent_titel: 'Muzyka?',
+    consent_ja: '🎉 Świętujmy z muzyką',
+    consent_nein: '✨ Kontynuuj bez muzyki',
+    consent_hinweis: 'Podczas odtwarzania dane, takie jak Twój adres IP, są przesyłane do YouTube/Google.',
+    consent_datenschutz: 'Polityka prywatności Google',
   },
 };

@@ -46,7 +46,8 @@
     <div class="discokugel__kugel"></div>
   </div>
 
-  <!-- YouTube-Video als Vollbild-Hintergrund (iframe wird per JS eingesetzt,
+  <!-- YouTube-Video als Vollbild-Hintergrund (iframe wird per JS ERST nach
+       musikalischer Einwilligung eingesetzt, youtube-nocookie.com;
        pointer-events: none damit Scrollen/Antippen weiter funktioniert) -->
   <div class="video-hintergrund" id="video-hintergrund" aria-hidden="true">
     <div id="yt-player"></div>
@@ -83,6 +84,30 @@
         <button type="button" class="sprach-button" data-sprache="de" lang="de">Deutsch</button>
         <button type="button" class="sprach-button" data-sprache="en" lang="en">English</button>
         <button type="button" class="sprach-button" data-sprache="pl" lang="pl">Polski</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MUSIK-CONSENT (Zwei-Klick-Lösung) ============ -->
+  <!-- Erscheint nach der Sprachauswahl. Erst der Klick auf „Mit Musik feiern"
+       (oder später der Sound-Button) ist die Einwilligung UND die Nutzergeste,
+       die das youtube-nocookie-iframe dynamisch einsetzt. -->
+  <section class="sprach-overlay" id="musik-consent" hidden>
+    <div class="discokugel discokugel--overlay" aria-hidden="true">
+      <div class="discokugel__kugel"></div>
+    </div>
+
+    <div class="sprach-overlay__inhalt">
+      <p class="overlay-klein">✦ Studio 54 Night ✦</p>
+      <h1 class="sprach-overlay__titel" data-i18n="consent_titel">Musik?</h1>
+
+      <div class="sprach-buttons">
+        <div class="consent-wahl">
+          <button type="button" class="sprach-button" id="consent-ja" data-i18n="consent_ja">🎉 Mit Musik feiern</button>
+          <p class="consent-hinweis" data-i18n="consent_hinweis">Beim Abspielen werden Daten wie deine IP-Adresse an YouTube/Google übertragen.</p>
+          <a class="consent-privacy" href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-i18n="consent_datenschutz">Google-Datenschutzerklärung</a>
+        </div>
+        <button type="button" class="sprach-button" id="consent-nein" data-i18n="consent_nein">✨ Ohne Musik weiter</button>
       </div>
     </div>
   </section>
@@ -177,10 +202,11 @@
   <footer class="footer">
     <div class="discokugel discokugel--hintergrund footer__kugel" aria-hidden="true"></div>
     <p data-i18n="footer_text">Mit Liebe &amp; Glitzer gebastelt</p>
+    <p class="footer__musik" data-i18n="footer_musik">Musik: Bee Gees – More Than a Woman (YouTube)</p>
   </footer>
 
-  <!-- YouTube IFrame API (lädt asynchron, Callback: onYouTubeIframeAPIReady in main.js) -->
-  <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- YouTube IFrame API wird bewusst NICHT statisch geladen (Datenschutz!):
+       main.js fügt das Script erst nach musikalischer Einwilligung ein. -->
 
   <script src="js/translations.js"></script>
   <script src="js/main.js"></script>
