@@ -232,34 +232,10 @@ a { color: var(--gold-hell); }
 /* ------------------------------------------------------------
    Sound-Button (fix, oben rechts) & Musik-Fallback
    ------------------------------------------------------------ */
-/* Groß, fix oben MITTIG – der primäre Musik-Schalter */
-.sound-button {
-  position: fixed;
-  top: max(14px, env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  width: clamp(4.75rem, 16vw, 6.25rem);
-  height: clamp(4.75rem, 16vw, 6.25rem);
-  border-radius: 50%;
-  font-size: clamp(2rem, 7vw, 2.6rem);
-  color: var(--gold-hell);
-  background: rgba(10, 7, 3, .65);
-  border: 2px solid rgba(212, 175, 55, .75);
-  box-shadow: var(--glow);
-  backdrop-filter: blur(4px);
-  transition: transform .2s ease, box-shadow .3s ease;
-  animation: puls-glow 2.6s ease-in-out infinite;
-}
-
-.sound-button:hover,
-.sound-button:focus-visible { transform: translateX(-50%) scale(1.08); box-shadow: 0 0 20px rgba(212, 175, 55, .8); }
-
-/* Schmaler Button direkt UNTER dem Sound-Button (fixe Positionierung,
-   deshalb rechnet top die Sound-Button-Höhe mit ein) */
+/* Schmaler Button fix oben MITTIG (↩ zurück zur Sprachauswahl) */
 .sprachwahl-button {
   position: fixed;
-  top: calc(max(14px, env(safe-area-inset-top)) + clamp(4.75rem, 16vw, 6.25rem) + .55rem);
+  top: max(14px, env(safe-area-inset-top));
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
@@ -280,23 +256,30 @@ a { color: var(--gold-hell); }
 .sprachwahl-button:hover,
 .sprachwahl-button:focus-visible { color: #fff3cf; border-color: var(--gold); }
 
-.musik-fallback {
+/* Musik-Button: fix UNTEN mittig. Sichtbar, solange keine Musik läuft;
+   jeder Klick = Einwilligung + Nutzergeste zum Start. */
+.musik-button {
   position: fixed;
-  top: 50%;
+  bottom: calc(1.2rem + env(safe-area-inset-bottom));
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   z-index: 60;
-  padding: 1rem 2rem;
+  padding: .95rem 1.9rem;
   border-radius: 999px;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 600;
   letter-spacing: .06em;
+  white-space: nowrap;
   color: var(--schwarz);
   background: linear-gradient(135deg, var(--gold-hell), var(--gold) 55%, var(--gold-dunkel));
   border: 2px solid rgba(255, 240, 200, .85);
   box-shadow: var(--glow);
-  animation: puls-glow 2.2s ease-in-out infinite;
+  backdrop-filter: blur(4px);
+  animation: puls-glow 2.6s ease-in-out infinite;
 }
+
+.musik-button:hover,
+.musik-button:focus-visible { transform: translateX(-50%) scale(1.07); }
 
 @keyframes puls-glow {
   0%, 100% { box-shadow: 0 0 14px rgba(212, 175, 55, .55), 0 0 40px rgba(212, 175, 55, .25); }
@@ -412,13 +395,13 @@ a { color: var(--gold-hell); }
    Hero
    ------------------------------------------------------------ */
 /* Blockflow statt Vollhöhen-Grid: kompakt, Bild folgt direkt
-   unter den fixen Buttons oben (deshalb das großzügige top-padding). */
+   unter dem ↩-Button oben (deshalb das großzügige top-padding). */
 .hero {
   position: relative;
   z-index: 5;
   text-align: center;
   padding:
-    calc(max(14px, env(safe-area-inset-top)) + clamp(4.75rem, 16vw, 6.25rem) + 3.9rem)
+    calc(max(14px, env(safe-area-inset-top)) + 4.2rem)
     1rem 1.5rem;
 }
 
@@ -654,8 +637,7 @@ a { color: var(--gold-hell); }
   html { scroll-behavior: auto; }
 
   .stern, .discokugel__kugel::before, .discokugel__kugel::after,
-  .sprach-button, .musik-fallback, .hero__bild, .hero__hinweis,
-  .sound-button {
+  .sprach-button, .musik-button, .hero__bild, .hero__hinweis {
     animation: none !important;
   }
 

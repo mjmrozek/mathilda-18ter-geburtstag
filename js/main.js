@@ -42,7 +42,6 @@ let ytApiBereit = false;      // Merker: IFrame-API geladen?
 let ytApiLaeuft  = false;     // Merker: API-Script wird gerade geladen (Doppelstart verhindern)
 let startAusstehend = false;  // Start-Wunsch, bevor die API bereit war (Start nachholen)
 let musikAktiv = false;       // Läuft gerade Ton?
-let istStumm = false;         // Merker für den 🔊/🔇-Button
 let musikFehlgeschlagen = false; // onError → Seite läuft ohne Musik weiter
 let heroBildGezeigt = false;  // Hero-Bild schon eingeblendet?
 
@@ -58,9 +57,8 @@ document.addEventListener('DOMContentLoaded', initialisiere);
 function initialisiere() {
   dom.sprachOverlay   = document.getElementById('sprach-overlay');
   dom.sprachButtons   = document.querySelectorAll('.sprach-button');
-  dom.soundButton     = document.getElementById('sound-button');
+  dom.musikButton     = document.getElementById('musik-button');
   dom.sprachwahlButton = document.getElementById('sprachwahl-button');
-  dom.musikFallback   = document.getElementById('musik-fallback');
   dom.musikConsent    = document.getElementById('musik-consent');
   dom.consentJa       = document.getElementById('consent-ja');
   dom.consentNein     = document.getElementById('consent-nein');
@@ -97,12 +95,11 @@ function initialisiere() {
 }
 
 // Nach der Consent-Entscheidung: Buttons einsetzen + Hero-Bild einblenden.
-// Die Musik startet NICHT hier (kein Autoplay!), sondern nur durch den
-// Consent-Klick oder durch den späteren Sound-Button.
+// Die Musik läuft schon, wenn „Mit Musik feiern" gewählt wurde; sonst startet
+// sie erst per „🎵 Musik starten"-Button (jeder Klick = Einwilligung).
 function starteSeite(heroSofort) {
-  dom.soundButton.hidden = false;
-  dom.sprachwahlButton.hidden = false;
-  aktualisiereSoundButton();
+  dom.musikButton.hidden = false;      // solange keine Musik läuft sichtbar;
+  dom.sprachwahlButton.hidden = false; // verschwindet, sobald Ton zu hören ist
   if (heroSofort) heroBildAnzeigen(); else heroBildVerzoegertZeigen();
 }
 
@@ -240,8 +237,6 @@ function wendeSpracheAn(lang) {
 
   // Galerie auf die gewählte Sprache eingrenzen: nur deren 2 Karten anzeigen
   aktualisiereGalerieSprache(lang);
-
-  aktualisiereSoundButton();
 }
 
 // Übersetzung sicher abfragen
@@ -340,9 +335,7 @@ function beiStatuswechsel(event) {
   if (!YT) return;
   if (event.data === YT.PlayerState.PLAYING) {
     musikAktiv = true;
-    istStumm = false;
-    dom.musikFallback.hidden = true;   // Fallback-Button nicht mehr nötig
-    aktualisiereSoundButton();
+    dom.musikButton.hidden = true;   // Musik läuft → Start/Mute-Button nicht mehr nötig
   }
   // Schleife absichern: falls „loop" von YouTube ignoriert wird, von vorn starten
   if (event.data === YT.PlayerState.ENDED) {
@@ -352,14 +345,13 @@ function beiStatuswechsel(event) {
 }
 
 // onError des Videos: Seite läuft ohne Musik weiter (Discokugel + Glitzer),
-// Sound-Button und Fallback-Button ausblenden.
+// Musik-Button ausblenden (Starten hätte keinen Erfolg).
 function beiPlayerFehler() {
   musikFehlgeschlagen = true;
-  if (dom.musikFallback) dom.musikFallback.hidden = true;
-  if (dom.soundButton) dom.soundButton.hidden = true;
+  if (dom.musikButton) dom.musikButton.hidden = true;
 }
 
-// Prüft nach 2 Sekunden, ob wirklich Musik läuft; sonst Fallback-Button zeigen
+// Prüft nach 2 Sekunden, ob wirklich Musik läuft; sonst Musik-Button zeigen
 function pruefeWiedergabe() {
   setTimeout(() => {
     if (musikFehlgeschlagen) return;
@@ -367,56 +359,21 @@ function pruefeWiedergabe() {
       ? player.getPlayerState() : -1;
     // Zustand 1 (PLAYING) oder 3 (BUFFERING) heißt: Video ist unterwegs
     if (zustand !== 1 && zustand !== 3) {
-      dom.musikFallback.hidden = false;
-      dom.soundButton.hidden = false;
+      dom.musikButton.hidden = false;
     }
   }, FALLBACK_TIMEOUT_MS);
 }
 
-// 🔊/🔇-Button oben rechts:
-//   – startet die Musik, wenn sie (noch) nicht läuft (z. B. erneuter Besuch)
-//   – schaltet ansonsten Ton an/aus
+// „🎵 Musik starten“ (fix unten) + „↩ Zurück zur Sprachauswahl“ verdrahten
 function verdrahteAudioButtons() {
-  dom.soundButton.addEventListener('click', () => {
-    if (!player) {
-      // Jeder Start über diesen Button = musikalische Einwilligung
-      speichereConsent('ja');
-      istStumm = false;
-      aktualisiereSoundButton();   // Sofort-Feedback: Icon springt auf 🔊
-      starteMusik();               // falls der Start klemmt, greift der
-      return;                      // Fallback-Check nach 2 Sek.
-    }
-    if (istStumm) {
-      player.unMute();
-      player.setVolume(MUSIK_LAUTSTAERKE);
-      istStumm = false;
-    } else {
-      player.mute();
-      istStumm = true;
-    }
-    aktualisiereSoundButton();
-  });
-
-  dom.musikFallback.addEventListener('click', () => {
-    dom.musikFallback.hidden = true;
-    starteMusik();
+  dom.musikButton.addEventListener('click', () => {
+    // Jeder Start über diesen Button = musikalische Einwilligung
+    speichereConsent('ja');
+    starteMusik();   // falls der Start klemmt, bleibt der Button sichtbar
   });
 
   // „↩ Zurück zur Sprachauswahl“ → Overlay erneut öffnen (ohne Reload)
   dom.sprachwahlButton.addEventListener('click', zeigeSprachAuswahl);
-}
-
-// Icon + aria-Label des Sound-Buttons aktualisieren.
-// Durchgestrichen (🔇), solange KEINE Musik läuft oder stumm geschaltet ist;
-// offener Lautsprecher (🔊), sobald Ton zu hören ist.
-function aktualisiereSoundButton() {
-  if (!dom.soundButton || dom.soundButton.hidden) return;
-  const lauft = !!player && !istStumm && !musikFehlgeschlagen;
-  const icon = lauft ? '🔊' : '🔇';
-  if (dom.soundButton.textContent !== icon) dom.soundButton.textContent = icon;
-  const lang = document.documentElement.lang || 'de';
-  dom.soundButton.setAttribute('aria-label',
-    uebersetzung(lang, lauft ? 'sound_aus_aria' : 'sound_an_aria') || '');
 }
 
 

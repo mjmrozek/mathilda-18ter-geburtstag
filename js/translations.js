@@ -50,10 +50,8 @@ const UEBERSETZUNGEN = {
     galerie_alt_pl_titel: 'Złoty bilet: 18. Urodziny Mathildy – Studio 54',
     galerie_alt_pl_details: 'Karta zaproszenia po polsku z datą, godziną, miejscem i dresscode’em',
 
-    // Audio-Buttons
+    // Musik-/Sprachauswahl-Buttons
     musik_fallback: '🎵 Musik starten',
-    sound_an_aria: 'Hintergrundmusik einschalten',
-    sound_aus_aria: 'Hintergrundmusik ausschalten',
     sprachwahl_zurueck: '↩ Zurück zur Sprachauswahl',
 
     // Footer
@@ -107,10 +105,8 @@ const UEBERSETZUNGEN = {
     galerie_alt_pl_titel: 'Golden ticket card: Mathilda’s 18th Birthday – Studio 54 (Polish)',
     galerie_alt_pl_details: 'Invitation card in Polish with date, time, venue and dresscode',
 
-    // Audio buttons
+    // Music / language buttons
     musik_fallback: '🎵 Start the music',
-    sound_an_aria: 'Turn on background music',
-    sound_aus_aria: 'Turn off background music',
     sprachwahl_zurueck: '↩ Back to language selection',
 
     // Footer
@@ -164,10 +160,8 @@ const UEBERSETZUNGEN = {
     galerie_alt_pl_titel: 'Złoty bilet: 18. Urodziny Mathildy – Studio 54',
     galerie_alt_pl_details: 'Karta zaproszenia po polsku z datą, godziną, miejscem i dresscode’em',
 
-    // Przyciski audio
+    // Muzyka / wybór języka
     musik_fallback: '🎵 Włącz muzykę',
-    sound_an_aria: 'Włącz muzykę w tle',
-    sound_aus_aria: 'Wyłącz muzykę w tle',
     sprachwahl_zurueck: '↩ Powrót do wyboru języka',
 
     // Stopka
