@@ -8,11 +8,11 @@
         ausdrücklicher Einwilligung dynamisch geladen.
      3. „Mit Musik feiern" = Einwilligung + Nutzergeste:
         youtube-nocookie.com-iframe, Start MIT Ton, danach blendet
-        das Einladungsbild sanft ein. / „Ohne Musik weiter" reine
-        CSS-Disco-Visuals; der Sound-Button startet später
+        das Einladungsbild sanft ein. / „Ohne Musik weiter" → reine
+        CSS-Disco-Visuals; der 🎵-Musik-Button startet später
         (jeder Klick darauf = Einwilligung).
-     4. Fallback: kommt innerhalb von 2 Sek. kein Wiedergabe-Event,
-        erscheint der Button „Musik starten".
+     4. Fallback: klemmt der Start, bleibt der 🎵-Musik-Button
+        (fix unten) sichtbar, bis Ton wirklich läuft.
      5. Wieder-Besuch: kein Overlay, Musik startet NIE automatisch.
    ============================================================ */
 
@@ -81,7 +81,7 @@ function initialisiere() {
   if (gespeicherteSprache && consent) {
     // Wieder-Besuch: direkt auf der Seite — KEIN Overlay, KEIN Musik-Autoplay
     wendeSpracheAn(gespeicherteSprache);
-    starteSeite(true); // Hero-Bild sofort zeigen, Sound-Button zum Nachstarten offerieren
+    starteSeite(true); // Hero-Bild sofort zeigen, Musik-Button zum Nachstarten bieten
   } else if (gespeicherteSprache) {
     // Sprache bekannt, Einwilligung aber noch offen (z. B. alte Version):
     // direkt zum Consent-Screen (Sprach-Overlay wird übersprungen)
@@ -185,7 +185,7 @@ function verdrahteConsentButtons() {
   });
 
   dom.consentNein.addEventListener('click', () => {
-    // Ohne Musik weiterlaufen; Sound-Button kann später starten = Einwilligung
+    // Ohne Musik weiterlaufen; Musik-Button startet später (Klick = Einwilligung)
     speichereConsent('nein');
     schliesseConsent(false);
   });
@@ -335,7 +335,7 @@ function beiStatuswechsel(event) {
   if (!YT) return;
   if (event.data === YT.PlayerState.PLAYING) {
     musikAktiv = true;
-    dom.musikButton.hidden = true;   // Musik läuft → Start/Mute-Button nicht mehr nötig
+    dom.musikButton.hidden = true;   // Musik läuft → Musik-Button nicht mehr nötig
   }
   // Schleife absichern: falls „loop" von YouTube ignoriert wird, von vorn starten
   if (event.data === YT.PlayerState.ENDED) {
