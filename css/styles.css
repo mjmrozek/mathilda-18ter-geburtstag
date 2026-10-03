@@ -784,13 +784,100 @@ body.intro-aktiv {
 }
 
 /* ------------------------------------------------------------
+   FINALE-ESKALATION (2026-10-03) — Konfetti, Blitz, Regenbogen
+   (alles hierzu steht in js/intro.js → finaleEskalation)
+   ------------------------------------------------------------ */
+
+/* Konfetti-Stück: buntes Rechteck, fliegt rotierend + 3D-flippend
+   vom Textzentrum nach außen (JS setzt Farbe, Größe, --kx/--ky/--kz/--kf) */
+.intro-konfetti {
+  position: absolute;
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, .35); /* hell leuchtend */
+  animation: intro-konfetti-fliegt 1.4s ease-out forwards;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@keyframes intro-konfetti-fliegt {
+  from { opacity: 1; transform: translate(0, 0) rotate(0deg) rotateY(0deg) scale(1); }
+  60%  { opacity: 1; }
+  to   { opacity: 0; transform: translate(var(--kx, 0), var(--ky, 0))
+         rotate(var(--kz, 0deg)) rotateY(var(--kf, 0deg)) scale(.5); }
+}
+
+/* Boom-Moment: kurzzeitiger weissgoldener Vollbild-Blitz */
+.intro-bumm {
+  position: fixed;
+  inset: 0;
+  z-index: 1001; /* über dem Layer-Inhalt; pointer-events: none → ✕ bleibt klickbar */
+  background: radial-gradient(circle at 50% 42%,
+    rgba(255, 255, 240, .95) 0%,
+    rgba(255, 230, 160, .55) 22%,
+    transparent 60%);
+  animation: intro-bumm-flash .7s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes intro-bumm-flash {
+  from { opacity: 0; }
+  12%  { opacity: 1; } /* knallhart rein — das ist der Aufprall */
+  to   { opacity: 0; }
+}
+
+/* Eskalation am Text: „★ BIRTHDAY PARTY ★" → laufendes Regenbogen-
+   Gradient (überschreibt Gold-Regel oben nur hier — Blöcke weiter
+   unten in derselben Datei gewünscht) */
+.intro-finale-party {
+  background: linear-gradient(90deg,
+    #ff4d6d, #ffb347, #ffe066, #7dff8a, #4dd8ff, #5b8cff, #b28bff, #ff8ad8);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none; /* Schatten unter Transparent-Text = Blobs */
+  filter: drop-shadow(0 0 6px rgba(255, 235, 180, .55));
+  animation: intro-party-regenbogen 2.4s linear infinite;
+}
+
+@keyframes intro-party-regenbogen {
+  from { background-position: 0% 50%; }
+  to   { background-position: -300% 50%; }
+}
+
+/* „MATHILDA“ + „18“ fliegen mit Bang ein (Überschwung-Kurve) … */
+.intro-finale-wort,
+.intro-finale-zahl {
+  animation: intro-bumm-popp .55s cubic-bezier(.2, 1.7, .4, 1) both;
+}
+
+.intro-finale-zahl { animation-delay: .12s; }
+
+@keyframes intro-bumm-popp {
+  from { opacity: 0; transform: scale(.3); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* … und die 18 bekommt einen Regenbogen-Halo-Glow (überschreibt
+   den Gold-Glow nur hier) */
+.intro-finale-zahl {
+  text-shadow:
+    0 0 14px rgba(255, 77, 109, .55),
+    0 0 26px rgba(255, 224, 102, .45),
+    0 0 44px rgba(77, 216, 255, .35);
+}
+
+/* ------------------------------------------------------------
    INTRO bei prefers-reduced-motion: kein Sound (JS), kein Puls,
-   Texte statisch sichtbar — Funkten entfallen (JS-Guard)
+   Texte statisch sichtbar — Funkten/Konfetti/Blitz entfallen
+   (JS-Guard + diese Regeln)
    ------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   .intro-herz, .intro-schritt, .intro-funke { animation: none !important; }
   .intro-schritt { opacity: 1; transform: none; }
-  .intro-funke { display: none; }
+  .intro-funke, .intro-konfetti, .intro-bumm { display: none; }
+  .intro-finale-party { background: none; color: #ffd97a; filter: none; }
+  .intro-finale-wort, .intro-finale-zahl { animation: none; }
 }
 
 /* ------------------------------------------------------------

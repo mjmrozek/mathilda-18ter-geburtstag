@@ -11,6 +11,10 @@
      2. Klick/Tap auf das Herz → Trailer (jeder Schritt ca. 2,5 s,
         Fade/Scale, über schwarzem Grund, zentriert):
           „2027" → „23.01." → „19:00" → „MATHILDA 18" (+ „★ PARTY ★")
+        FINALE (= Eskalation, 2026-10-03): Doppel-Herzschlag + Sound-Boom
+        + Blitz + Gold-Funken + 3 aufsteigende KONFETTI-Wellen (Regenbogen
+        + Gold), „★ BIRTHDAY PARTY ★" als laufendes Regenbogen-Gradient,
+        „18" mit Regenbogen-Glow — danach erst der Fade-out.
         Herzschlag-Sound (Web Audio API, „lub-dub"-Loop) startet
         MIT dem Herz-Klick (kein Ton davor!) und pochend im
         Herzschlag-Rhythmus synchron mit den Texten.
@@ -31,10 +35,20 @@
 const INTRO_SEQUENCE = ['2027', '23.01.', '19:00', 'MATHILDA 18'];
 
 const INTRO_SCHRITT_MS = 2600;   // Anzeigedauer pro Trailer-Schritt
-const INTRO_FINALE_MS  = 2400;   // Anzeigedauer des Finales vor dem Fade-out
+const INTRO_FINALE_MS  = 3200;   // Anzeigedauer des Finales vor dem Fade-out
+                                 // (länger als ein Schritt — die Konfetti-
+                                 // Eskalation braucht Luft, siehe unten)
 const INTRO_HERZ_RHYTHMUS = 1000; // lub-dub-Paar alle X ms (Schritt 1)
 const INTRO_SCHNELLER_RHYTHMUS = 780; // Puls leicht schneller (Schritte 2/3)
 const INTRO_FUNKEN_ANZAHL = 46;  // Gold-Glitzer-Funken im Finale
+
+// KONFETTI-ESKALATION im Finale (2026-10-03): 3 Wellen nacheinander,
+// jede größer und weiter fliegend als die vorherige.
+const INTRO_KONFETTI_PRO_STUFE = [0, 42, 60, 85]; // Index = Wellen-Stufe
+const INTRO_KONFETTI_FARBEN = [                    // Regenbogen + Gold
+  '#ff4d6d', '#ffb347', '#ffe066', '#7dff8a', '#4dd8ff',
+  '#5b8cff', '#b28bff', '#ff8ad8', '#f5d98b', '#d4af37',
+];
 
 /* ============================================================
    ZUSTAND (lokal, kollidert mit nichts im main.js)
@@ -159,12 +173,12 @@ function zeigeSchritt(text, letzter) {
       '<span class="intro-finale-zahl">' + textOhneHtml(zahl) + '</span>' +
       '<span class="intro-finale-party">★ BIRTHDAY PARTY ★</span>';
 
-    // Letzter kräftiger Doppel-Schlag + Gold-Glitzer-Burst zum Finale
+    // Die große Finale-ESKALATION (2026-10-03): kräftiger Doppel-
+    // Herzschlag + Sound-Boom + Blitz + Gold-Funken + 3 Konfetti-Wellen
     introSpaeter(() => {
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        finaleHerzschlag();
-        streueIntroFunken(schritt);
-      }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      finaleHerzschlag();
+      finaleEskalation(schritt);
     }, 700);
   } else {
     schritt.textContent = text;
@@ -202,6 +216,59 @@ function streueIntroFunken(buehne) {
     funke.addEventListener('animationend', () => funke.remove());
     buehne.appendChild(funke);
   }
+}
+
+/* ============================================================
+   FINALE-ESKALATION (2026-10-03, Nutzer-Wunsch: „richtige
+   Eskalation") — alles NUR hier im intro.js, kein Bestandscode:
+     1. Sound-Boom (dumpfer Bass + Konfetti-Rauschen, Web Audio)
+     2. Vollbild-Blitz (weissgold, kurz)
+     3. Gold-Funken (wie bisher)
+     4. 3 Konfetti-Wellen mit steigender Menge & Wucht
+   (prefers-reduced-motion: caller ruft diese Funktion gar nicht)
+   ============================================================ */
+function finaleEskalation(buehne) {
+  streueIntroFunken(buehne);          // Gold-Funken wie gehabt
+  finalesBumm();                      // Sound: Boom + Rauschen
+  finaleBlitz();                      // Blitz-Overlay
+  streueKonfetti(buehne, 1);          // Welle 1 sofort
+  introSpaeter(() => streueKonfetti(buehne, 2), 600);  // Welle 2 dicker
+  introSpaeter(() => streueKonfetti(buehne, 3), 1200); // Welle 3 am größten
+}
+
+// Eine Konfetti-Welle: bunte Stücke fliegen rotierend + 3D-flippend
+// vom Textzentrum nach außen (Stufe bestimmt Menge & Weite)
+function streueKonfetti(buehne, stufe) {
+  const menge = INTRO_KONFETTI_PRO_STUFE[Math.min(stufe, INTRO_KONFETTI_PRO_STUFE.length - 1)];
+  const weite = 60 + stufe * 70; // Welle 1 → 130px, 2 → 200px, 3 → 270px
+
+  for (let i = 0; i < menge; i++) {
+    const konfetti = document.createElement('span');
+    konfetti.className = 'intro-konfetti';
+    konfetti.style.background = INTRO_KONFETTI_FARBEN[Math.floor(Math.random() * INTRO_KONFETTI_FARBEN.length)];
+    konfetti.style.width  = (Math.random() * 6 + 5)  + 'px';
+    konfetti.style.height = (Math.random() * 9 + 7) + 'px';
+    konfetti.style.left = (38 + Math.random() * 24) + '%';
+    konfetti.style.top  = (36 + Math.random() * 22) + '%';
+    konfetti.style.setProperty('--kx', ((Math.random() * 2 - 1) * weite) + 'px');
+    konfetti.style.setProperty('--ky', ((Math.random() * 1.6 - .6) * weite) + 'px'); // tendenz: nach unten fallen
+    konfetti.style.setProperty('--kz', (Math.random() * 720 - 360) + 'deg'); // Schraub-Rotation
+    konfetti.style.setProperty('--kf', (Math.random() * 540 - 270) + 'deg'); // 3D-Flip
+    konfetti.style.animationDelay = (Math.random() * 350) + 'ms';
+    konfetti.style.animationDuration = (Math.random() * 600 + 1100) + 'ms';
+    konfetti.addEventListener('animationend', () => konfetti.remove());
+    buehne.appendChild(konfetti);
+  }
+}
+
+// Vollbild-Blitz zum Boom-Moment (stellt den Aufprall ins Auge)
+function finaleBlitz() {
+  const layer = document.getElementById('intro');
+  if (!layer) return;
+  const blitz = document.createElement('div');
+  blitz.className = 'intro-bumm';
+  blitz.addEventListener('animationend', () => blitz.remove());
+  layer.appendChild(blitz);
 }
 
 /* ============================================================
@@ -266,6 +333,50 @@ function finaleHerzschlag() {
     introSchlag(zeit + versatz, 1);         // lub — ganz kräftig
     introSchlag(zeit + versatz + 0.22, 0.8); // dub
   }
+}
+
+// SOUND-BOOM zur Eskalation: dumpfer Bass-Drop + kurzes Konfetti-
+// Rauschen. Kein Sample nötig — entsteht komplett per Web Audio.
+function finalesBumm() {
+  if (!introAudioCtx) return;
+  const zeit = introAudioCtx.currentTime + 0.02;
+
+  // Bass-Drop (Kreuzer-Brummen im Miniaturformat)
+  const bass = introAudioCtx.createOscillator();
+  const bassGain = introAudioCtx.createGain();
+  bass.type = 'sine';
+  bass.frequency.setValueAtTime(150, zeit);
+  bass.frequency.exponentialRampToValueAtTime(40, zeit + 0.4);
+  bassGain.gain.setValueAtTime(0.0001, zeit);
+  bassGain.gain.exponentialRampToValueAtTime(0.9, zeit + 0.02);
+  bassGain.gain.exponentialRampToValueAtTime(0.0001, zeit + 0.55);
+  bass.connect(bassGain);
+  bassGain.connect(introMaster);
+  bass.start(zeit);
+  bass.stop(zeit + 0.6);
+
+  // Konfetti-Rauschen: kurz, abklingend, bandpassgefiltert — klingt
+  // wie zischendes Party-Konfetti statt wie ein Fehler-Noise
+  const dauer = 0.5;
+  const puffer = introAudioCtx.createBuffer(
+    1, Math.ceil(introAudioCtx.sampleRate * dauer), introAudioCtx.sampleRate);
+  const daten = puffer.getChannelData(0);
+  for (let i = 0; i < daten.length; i++) {
+    daten[i] = (Math.random() * 2 - 1) * (1 - i / daten.length);
+  }
+  const quelle = introAudioCtx.createBufferSource();
+  quelle.buffer = puffer;
+  const filter = introAudioCtx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 2400;
+  filter.Q.value = 0.7;
+  const rauschGain = introAudioCtx.createGain();
+  rauschGain.gain.setValueAtTime(0.25, zeit);
+  rauschGain.gain.exponentialRampToValueAtTime(0.0001, zeit + dauer);
+  quelle.connect(filter);
+  filter.connect(rauschGain);
+  rauschGain.connect(introMaster);
+  quelle.start(zeit);
 }
 
 /* ============================================================
