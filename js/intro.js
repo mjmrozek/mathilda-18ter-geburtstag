@@ -15,8 +15,9 @@
         MIT dem Herz-Klick (kein Ton davor!) und pochend im
         Herzschlag-Rhythmus synchron mit den Texten.
      3. Fade-out des Layers → Seite genau wie bisher.
-   SKIP: Tippen irgendwo auf den Trailer oder das „✕" oben rechts
-   überspringt sofort — Sound stoppt, Seite erscheint.
+   SKIP: NUR über das „✕" oben rechts — überspringt sofort, Sound
+   stoppt. Absichtliche Nutzer-Forderung: kein Skip durch Tippen
+ irgendwo (versehentliche Taps während des Trailers dürfen nichts tun).
    Kein Ton vor dem Herz-Klick (Web-Audio-Context entsteht erst in
    dieser Nutzergeste — auch für iOS/Safari nötig).
    ============================================================ */
@@ -64,15 +65,13 @@ let introZeitgeber  = [];     // alle setTimeout-Handles (Skip räumt auf)
   herz.textContent = '♥';
   herz.setAttribute('aria-label', 'Trailer starten');
   herz.addEventListener('click', (ereignis) => {
-    ereignis.stopPropagation(); // nicht als Skip-Tap gewertet
     starteTrailer();
   });
 
   layer.appendChild(herz);
-  layer.addEventListener('click', (ereignis) => {
-    // Tap irgendwo auf den Trailer = SKIP (Herz-Klick steigt oben aus)
-    if (introTrailerLaueft) skippeTrailer();
-  });
+  // WICHTIG (Nutzer-Entscheidung): KEIN Skip durch Tippen irgendwo —
+  // nur das „✕" oben rechts beendet den Trailer. Sonst würde jeder
+  // versehentliche Tap während des Trailers ihn abschalten.
   document.body.appendChild(layer);
   document.body.classList.add('intro-aktiv'); // Scrollfix während des Intros
 })();
