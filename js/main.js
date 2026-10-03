@@ -291,14 +291,24 @@ function baueSterne() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!container) return;
 
-  // 110 Sterne, einzelne davon spürbar größer (Auge fällt drauf beim Scrollen)
+  // 110 Sterne — deutlich sichtbar, mit Strahleffekt; Farbverlosung:
+  // Mischung aus Gold/Weiß (Studio-54) und kräftigen Regenbogenfarben.
+  const REGENBOGEN_TONES = [355, 40, 90, 150, 200, 260, 310]; // Rot→Violett
   const anzahl = 110;
   for (let i = 0; i < anzahl; i++) {
     const stern = document.createElement('span');
-    const gross = Math.random() < 0.15;
-    const groesse = gross ? (Math.random() * 2.2 + 3) : (Math.random() * 1.6 + 1.2);
+    const gross = Math.random() < 0.25;
+    const groesse = gross ? (Math.random() * 7 + 9) : (Math.random() * 4 + 4);
+    const regenbogen = Math.random() < 0.55;
+    const hue = regenbogen
+      ? REGENBOGEN_TONES[Math.floor(Math.random() * REGENBOGEN_TONES.length)]
+        + (Math.random() * 16 - 8)
+      : (Math.random() * 10 + 42); // Gold-/Hellgelb-Töne
+    stern.classList.add('stern');
     if (gross) stern.classList.add('stern--gross');
-    stern.className = 'stern';
+    stern.style.setProperty('--f',
+      `hsl(${hue.toFixed(0)} 100% ${regenbogen ? 76 : 72}%)`);
+    stern.style.setProperty('--dreh', Math.floor(Math.random() * 360) + 'deg');
     stern.style.width  = groesse + 'px';
     stern.style.height = groesse + 'px';
     stern.style.left   = Math.random() * 100 + '%';

@@ -60,24 +60,42 @@ a { color: var(--gold-hell); }
   z-index: 1;
 }
 
+/* Einzelner Stern: 4-strahliger Funkenstern ( deutliche Strahlen! ).
+   Farbe per CSS-Var --f (Gold- oder Regenbogenfarbe, per JS verlost);
+   der Glow sitzt als drop-shadow auf dem Elternteil, clip-path auf dem
+   Pseudo-Element — so wird der Schein NICHT mit weggeschnitten. */
 .stern {
   position: absolute;
-  border-radius: 50%;
-  background: #fff8e1;
-  box-shadow: 0 0 8px 2px rgba(255, 230, 160, .95);
   opacity: 0;
   animation: funken 5s infinite;
+  filter:
+    drop-shadow(0 0 3px var(--f, #ffe6a0))
+    drop-shadow(0 0 8px var(--f, #ffe6a0));
 }
 
-/* Große Ausreißer-Sterne funkeln kräftiger (fallen direkt auf) */
+.stern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* heißer weißer Kern, außen in der Sternfarbe auslaufend */
+  background: radial-gradient(circle at 50% 50%,
+    #ffffff 0%, var(--f, #fff8e1) 42%, transparent 72%);
+  /* lange, dünne Strahlen + schmaler diagonaler Mittelkörper */
+  clip-path: polygon(50% 0%, 56% 44%, 100% 50%, 56% 56%, 50% 100%
+    , 44% 56%, 0% 50%, 44% 44%);
+}
+
+/* Große Ausreißer-Sterne strahlen deutlich kräftiger */
 .stern--gross {
-  background: #fffef5;
-  box-shadow: 0 0 10px 3px rgba(255, 230, 160, 1), 0 0 22px 6px rgba(212, 175, 55, .55);
+  filter:
+    drop-shadow(0 0 4px var(--f, #ffe6a0))
+    drop-shadow(0 0 10px var(--f, #ffe6a0))
+    drop-shadow(0 0 22px var(--f, #d4af37));
 }
 
 @keyframes funken {
-  0%, 100% { opacity: 0; transform: scale(.4); }
-  50%      { opacity: 1; transform: scale(1.15); }
+  0%, 100% { opacity: 0; transform: scale(.25) rotate(var(--dreh, 0deg)); }
+  50%      { opacity: 1; transform: scale(1.25) rotate(var(--dreh, 0deg)); }
 }
 
 /* Goldfunken-Spur: Partikel folgen Finger/Cursor (per main.js erzeugt) */
