@@ -1,6 +1,6 @@
 # CLAUDE.md — Mathildas 18ter Geburtstag · Studio-54-Einladung
 
-Zusammenfassung aus MEINER (Claude-)Sicht, Stand **2026-10-03 (Trailer-Intro + Stereo-Überarbeitung)**. Für neue Sessions: Lies zuerst »Ablauf« und »Feste Entscheidungen« — dort steht, was NICHT leichtfertig geändert werden darf.
+Zusammenfassung aus MEINER (Claude-)Sicht, Stand **2026-10-03 (Trailer-Intro + Zoom-Sicherung)**. Für neue Sessions: Lies zuerst »Ablauf« und »Feste Entscheidungen« — dort steht, was NICHT leichtfertig geändert werden darf.
 
 ## Projekt
 
@@ -25,12 +25,14 @@ One-Page-Geburtstagseinladung im **Studio-54-Stil** (Schwarz & Gold, Glitzer, Ne
 ## Dateistruktur
 
 ```
-index.html            — Markup; alle Sektionen + festes Menü oben + eine Script-Zeile für intro.js
+index.html            — Markup; alle Sektionen + festes Menü oben + Script-Zeilen am body-Ende
+                        (translations, main, intro, zoomsicherung — bewusst in dieser Reihenfolge)
 css/styles.css        — komplettes Styling; Farbsystem & --video-filter in :root;
                         INTRO/TRAILER-Block am ENDE der Datei (anhang für js/intro.js)
 js/translations.js    — ALLE sichtbaren Texte in de/en/pl (UEBERSETZUNGEN-Objekt)
 js/main.js            — komplette Logik; Konstanten ganz oben
 js/intro.js           — Trailer-Intro (komplett unabhängig, siehe unten; berühren nicht!)
+js/zoomsicherung.js   — Pinch-Zoom-Robustheit (komplett unabhängiger Anhang, siehe unten; berühren nicht!)
 images/einladung_1_<lang>.jpeg — Titel-Karte (Hero-Bild)
 images/einladung_2_<lang>.jpeg — Details-Karte (Galerie)
          <lang> = de | en | pl  (Namen so vom Nutzer angelegt, beibehalten!)
@@ -72,6 +74,7 @@ Implementiert in `initialisiere()` (main.js):
 - **Video-Behandlung:** schwarz-weiß + weichgezeichnet, damit Inhalte hervorstehen — als CSS-Variable `--video-filter` (styles.css, in `:root`), z. B. `grayscale(1) blur(6px)`; `scale(1.15)` am iframe gleicht blur-Ränder aus.
 - Musik **beginnt nie ohne explizite Nutzergeste** (Konservierungsregel für iOS/Safari + Datenschutz) — der 🎵-Klick ist diese Geste.
 - **Trailer-Intro (2026-10-03):** erscheint bei jedem Aufruf, Skip **NUR über „✕" oben rechts** — kein Tipp-irgendwo-Skip (Nutzer ausdrücklich!). Intro-Code als isolierter Anhang halten (intro.js + CSS-Block am Ende), bestehende Dateien nicht umbauen. Schrift Monoton, Texte groß/fett/lesbar, Finale „★ BIRTHDAY PARTY ★".
+- **Standard-Pinch-Zoom bleibt erlaubt + ZOOM-SICHERUNG (2026-10-03, Nutzer: „Seite verschwindet beim Zoom komplett"):** KEIN eigenes Zoom-Feature, kein `user-scalable=no`, keine Lightbox. Der Browser-Zoom (zwei Finger) macht einfach weiter. `js/zoomsicherung.js` (isolierter Anhang nach intro.js-Muster) hört auf `visualViewport` und setzt ab Skala ~1,1 `body.seite-gezoomt` → CSS-Block am ENDE von styles.css blendet nur die Deko-Ebenen (`.sterne`, `.glitzer-spur`, `.video-hintergrund`, `.video-abdunkelung`) sanft aus; zurück auf ~1× → alles wieder an. **Menüleiste `.kopf` bleibt unangetastet (fixe „nie weg"-Entscheidung), Intro außen vor (`body.intro-aktiv`-Guard), Desktop = null Effekt.** Nicht wieder entfernen, auch nicht „optimieren" auf Touch-Events!
 - **Musik-Pill „Klicke mich!"** (de/en/pl) mit **Wachs-Effekt** (jeder Klick macht sie größer, `--wuchs` bis Stufe 6) und **Supernova**, sobald der Ton wirklich läuft (Blitz + 2 Schockwellen-Ringe + 44 Regenbogen-Funken, dann Button + IP-Hinweis endgültig weg). Nicht zurückbauen — Nutzer wollte Anreiz-Gestaltung!
 - **Hintergrund-Sterne sind 4-strahlige Funkensterne** mit Regenbogen-Mischung (55 % bunt / 45 % Gold) — bewusst deutlich sichtbar (Nutzer-Wunsch „deutlicher, mit Strahlen, Regenbogenfarben").
 - **Video-Filter REIN Schwarz-Weiß:** `--video-filter: grayscale(1) blur(2px)` — grayscale < 1 lässt Restfarbe durch und passt nicht zur Farbpalette (Nutzer 2026-10-03).
@@ -116,7 +119,7 @@ Implementiert in `initialisiere()` (main.js):
 
 - **og:image / twitter:image auf absolute URL** umgestellt (index.html): `https://mathildas-18ter-geburtstag.netlify.app/images/einladung_1_de.jpeg` — nötig für die zuverlässige WhatsApp-Vorschau.
 - **Ein-Klick-Musikstart** (3. Session-Runde 2026-10-02): YouTube-iframe wird synchron in der 🎵-Klick-Geste eingesetzt, API attacht sich parallel — Doppelklick-Bug behoben.
-- **2026-10-03:** Hintergrund-Sterne → 4-strahlige Regenbogen-Funkensterne; 🎵-Pill → „Klicke mich!“ mit Wachs-Effekt + Supernova beim echten Play; Video-Filter → `grayscale(1)` (rein S/W); **Trailer-Intro komplett neu dazu** (`js/intro.js` + INTRO-CSS-Block + eine Script-Zeile).
+- **2026-10-03:** Hintergrund-Sterne → 4-strahlige Regenbogen-Funkensterne; 🎵-Pill → „Klicke mich!“ mit Wachs-Effekt + Supernova beim echten Play; Video-Filter → `grayscale(1)` (rein S/W); **Trailer-Intro komplett neu dazu** (`js/intro.js` + INTRO-CSS-Block + eine Script-Zeile); **Zoom-Sicherung neu dazu** (`js/zoomsicherung.js` + ZOOM-SICHERUNG-CSS-Block am Ende — gegen „Seite verschwindet beim Pinch-Zoom“, Nutzer-Bericht).
 
 ## Offene To-Dos
 

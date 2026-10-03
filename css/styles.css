@@ -792,3 +792,30 @@ body.intro-aktiv {
   .intro-schritt { opacity: 1; transform: none; }
   .intro-funke { display: none; }
 }
+
+/* ------------------------------------------------------------
+   ZOOM-SICHERUNG (2026-10-03, gehört zu js/zoomsicherung.js)
+
+   Der Browser-Pinch-Zoom (iPhone/WhatsApp-Browser zoomt nur den
+   sichtbaren Ausschnitt) lässt die fixen Deko-Ebenen in Miniatur-
+   größe über dem gezoomten Inhalt „zusammenfallen“. Abhilfe im
+   Script-Muster von intro.js (isoliert!): Nach dem Einzoomen
+   blendet diese Klasse nur die Deko aus — Menüleiste (.kopf, fixe
+   Nutzer-Entscheidung) bleibt unangetastet, Inhalte (z5) bleiben
+   vollständig lesbar und groß. Zurückgezoomt → alles wieder an.
+   ------------------------------------------------------------ */
+/* Sanfte Blende für Ebenen ohne eigene Transition; das Video behält
+   seinen vorhandenen 1,2-s-Fade im 1×-Normalzustand (unten angerührt). */
+.sterne,
+.glitzer-spur,
+.video-abdunkelung {
+  transition: opacity .35s ease;
+}
+
+body.seite-gezoomt .sterne,
+body.seite-gezoomt .glitzer-spur,
+body.seite-gezoomt .video-hintergrund,
+body.seite-gezoomt .video-abdunkelung {
+  opacity: 0;
+  transition: opacity .35s ease; /* gilt im Zoom-Zustand für alle vier */
+}
