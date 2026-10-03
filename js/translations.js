@@ -17,7 +17,7 @@ const UEBERSETZUNGEN = {
   de: {
     // Festes Menü oben
     // (Buttons "Deutsch/English/Polski" stehen statisch in der index.html)
-    musik_button: '🎵 Musik',
+    musik_button: '🎵 Klicke mich!',
     menu_aria: 'Musik und Sprache',
     musik_hinweis: 'Musik: Bee Gees – „More Than a Woman“ (YouTube). Beim Abspielen werden Daten wie deine IP-Adresse an YouTube/Google übertragen.',
     datenschutz_link: 'Datenschutzerklärung',
@@ -66,7 +66,7 @@ const UEBERSETZUNGEN = {
   /* ---------------------------------------------------------- */
   en: {
     // Fixed top menu (language buttons are static in index.html)
-    musik_button: '🎵 Music',
+    musik_button: '🎵 Click me!',
     menu_aria: 'Music and language',
     musik_hinweis: 'Music: Bee Gees – “More Than a Woman” (YouTube). While playing, data such as your IP address is transmitted to YouTube/Google.',
     datenschutz_link: 'Privacy policy',
@@ -115,7 +115,7 @@ const UEBERSETZUNGEN = {
   /* ---------------------------------------------------------- */
   pl: {
     // Stałe menu u góry (przyciski języków żyją statycznie w index.html)
-    musik_button: '🎵 Muzyka',
+    musik_button: '🎵 Kliknij mnie!',
     menu_aria: 'Muzyka i język',
     musik_hinweis: 'Muzyka: Bee Gees – „More Than a Woman” (YouTube). Podczas odtwarzania dane, takie jak Twój adres IP, są przesyłane do YouTube/Google.',
     datenschutz_link: 'Polityka prywatności',

@@ -245,18 +245,82 @@ a { color: var(--gold-hell); }
 .sprach-button:hover,
 .sprach-button:focus-visible { color: #fff3cf; border-color: var(--gold); transform: scale(1.06); }
 
-/* 🎵-Musik-Pill: gold hervorgehoben, Start = Einwilligung */
+/* 🎵-Musik-Pill: gold hervorgehoben, Start = Einwilligung.
+   WACHS: jeder Klick erhöht --wuchs (per JS) und macht die Pill
+   sichtbar größer — Neugier + Anreiz bis zur Supernova. */
 .menu-button--musik {
   color: var(--schwarz);
   background: linear-gradient(135deg, var(--gold-hell), var(--gold) 55%, var(--gold-dunkel));
   border: 2px solid rgba(255, 240, 200, .85);
   box-shadow: var(--glow);
   animation: puls-glow 2.6s ease-in-out infinite;
-  transition: transform .2s ease;
+  transform: scale(calc(1 + var(--wuchs, 0) * .16));
+  transition: transform .25s ease;
 }
 
 .menu-button--musik:hover,
-.menu-button--musik:focus-visible { transform: scale(1.07); }
+.menu-button--musik:focus-visible {
+  transform: scale(calc((1 + var(--wuchs, 0) * .16) * 1.07));
+}
+
+/* SUPERNOVA: Musik läuft wirklich → Pill explodiert.
+   Blitz: schnell größer werden, weiß aufleuchten, verschwinden. */
+.menu-button--nova {
+  animation: nova-blitz .8s ease-out forwards;
+}
+
+@keyframes nova-blitz {
+  0% {
+    transform: scale(calc(1 + var(--wuchs, 0) * .16));
+    filter: brightness(1);
+    opacity: 1;
+  }
+  35% {
+    transform: scale(calc((1 + var(--wuchs, 0) * .16) * 1.7));
+    filter: brightness(2.4) saturate(1.4);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3.6);
+    filter: brightness(3.2);
+    opacity: 0;
+  }
+}
+
+/* Schockwelle: Ring, der vom Button-Zentrum expandiert.
+   (absolute + px-Koordinaten wie die Glitzer-Funken — Layer .glitzer-spur) */
+.nova-ring {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 3px solid var(--gold-hell);
+  box-shadow:
+    0 0 24px rgba(255, 230, 160, .95),
+    inset 0 0 14px rgba(255, 230, 160, .7);
+  pointer-events: none;
+  animation: nova-ring-expand .9s ease-out forwards;
+}
+
+/* zweiter, weißer Ring — etwas langsamer, für Tiefe */
+.nova-ring--weiss {
+  border-color: #ffffff;
+  animation: nova-ring-expand 1.2s ease-out .1s forwards;
+}
+
+@keyframes nova-ring-expand {
+  0%   { transform: translate(-50%, -50%) scale(.4); opacity: 1; border-width: 4px; }
+  100% { transform: translate(-50%, -50%) scale(26); opacity: 0; border-width: 1px; }
+}
+
+/* Supernova-Funken: größer, bunter (Regenbogenfarbe per --f vom JS),
+   fliegen weiter als die Glitzer-Spur-Funken (--dx/--dy vom JS) */
+.glitzer--nova {
+  background: radial-gradient(circle at 50% 50%, #fff 0%, var(--f) 55%);
+  filter:
+    drop-shadow(0 0 6px var(--f))
+    drop-shadow(0 0 16px var(--f));
+}
 
 @keyframes puls-glow {
   0%, 100% { box-shadow: 0 0 14px rgba(212, 175, 55, .55), 0 0 40px rgba(212, 175, 55, .25); }

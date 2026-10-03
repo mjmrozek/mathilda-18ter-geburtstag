@@ -27,6 +27,9 @@ const FALLBACK_TIMEOUT_MS = 2000;        // Wartezeit bis zum Wiedergabe-Check
 // Google-Maps-Ziel für den Orts-Link
 const MAPS_ZIEL = 'https://www.google.com/maps/search/?api=1&query=An+d.+Neuen+M%C3%BChle+22%2C+47447+Moers-Kapellen';
 
+// Regenbogen-Farbtöne (Hue-Werte Rot→Violett) für Sterne & Supernova-Funken
+const REGENBOGEN_TONES = [355, 40, 90, 150, 200, 260, 310];
+
 // RSVP: hier später einbauen
 
 
@@ -37,6 +40,8 @@ let player = null;               // YouTube-Player-Instanz (attacht sich an den 
 let ytApiBereit = false;         // Merker: IFrame-API geladen?
 let ytApiLaeuft  = false;        // Merker: API-Script wird gerade geladen (Doppelstart verhindern)
 let musikFehlgeschlagen = false; // onError → Seite läuft ohne Musik weiter
+let wuchsZaehler  = 0;           // 🎵-Klicks — Button wächst mit jedem Klick
+let novaGelaufen  = false;       // Supernova nur EINMAL → Button danach weg
 
 // DOM-Referenzen (in initialisiere() gefüllt)
 const dom = {};
@@ -206,7 +211,12 @@ function baueYoutubeIframe() {
 
 // 🎵-Klick = Einwilligung + Start (der iframe geht in DIESER Geste raus)
 function starteMusik() {
-  if (musikFehlgeschlagen) return; // onError: ohne Musik weitermachen
+  if (musikFehlgeschlagen || novaGelaufen) return; // onError/Supernova: fertig
+
+  // Wachs-Effekt: jeder Klick macht den Button sichtbar größer —
+  // animiert zum Weitersparen, bis der Ton wirklich läuft (→ Supernova).
+  wuchsZaehler = Math.min(wuchsZaehler + 1, 6);
+  dom.musikButton.style.setProperty('--wuchs', String(wuchsZaehler));
 
   // Video-Layer langsam einblenden (schwarze Fläche → sichtbares Video)
   dom.videoContainer.classList.add('video-hintergrund--sichtbar');
@@ -228,13 +238,12 @@ function starteMusik() {
   pruefeWiedergabe();
 }
 
-// Attach fertig: Lautstärke setzen; läuft der Ton schon → Button/Hinweis weg
+// Attach fertig: Lautstärke setzen; läuft der Ton schon → Supernova!
 function beiPlayerBereit(event) {
   event.target.setVolume(MUSIK_LAUTSTAERKE);
   const YT = window.YT;
   if (YT && event.target.getPlayerState() === YT.PlayerState.PLAYING) {
-    dom.musikButton.hidden = true;
-    dom.musikHinweis.hidden = true;
+    supernova();
   }
 }
 
@@ -242,14 +251,100 @@ function beiStatuswechsel(event) {
   const YT = window.YT;
   if (!YT) return;
   if (event.data === YT.PlayerState.PLAYING) {
-    dom.musikButton.hidden = true;   // Musik läuft → 🎵-Button im Menü weg
-    dom.musikHinweis.hidden = true;  // Hinweis gehört zum Button
+    supernova(); // Musik läuft wirklich → Pill explodiert, dann weg
   }
   // Schleife absichern: falls „loop" von YouTube ignoriert wird, von vorn starten
   if (event.data === YT.PlayerState.ENDED) {
     event.target.seekTo(0);
     event.target.playVideo();
   }
+}
+
+// SUPERNOVA: Musik läuft tatsächlich → Button blitzt auf, expandiert,
+// Schockwellen-Ringe + Regenbogen-Funkenregen — danach Button und
+// IP-Hinweis dauerhaft weg (läuft nur einmal, siehe novaGelaufen).
+function supernova() {
+  if (novaGelaufen) return;
+  novaGelaufen = true;
+
+  // Ohne Bewegungen (reduced motion) ohne Show einfach wegblenden
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    dom.musikButton.hidden = true;
+    dom.musikHinweis.hidden = true;
+    return;
+  }
+
+  const rechteck = dom.musikButton.getBoundingClientRect();
+  const zentrumX = rechteck.left + rechteck.width / 2;
+  const zentrumY = rechteck.top  + rechteck.height / 2;
+
+  dom.musikButton.classList.add('menu-button--nova');
+  baueSupernovaRinge(zentrumX, zentrumY);
+  baueSupernovaFunken(zentrumX, zentrumY);
+
+  // Blitz dauert .8 s → danach Button + IP-Hinweis endgültig ausblenden
+  setTimeout(() => {
+    dom.musikButton.hidden = true;
+    dom.musikHinweis.hidden = true;
+    dom.musikButton.classList.remove('menu-button--nova');
+  }, 850);
+}
+
+// Zwei Schockwellen-Ringe vom Explosionszentrum (gold + weiß, versetzt)
+function baueSupernovaRinge(x, y) {
+  const ringe = [
+    { klassen: 'nova-ring', verzogerung: 0 },
+    { klassen: 'nova-ring nova-ring--weiss', verzogerung: 100 },
+  ];
+  for (const eintrag of ringe) {
+    setTimeout(() => {
+      if (!dom.glitzerSpur) return;
+      const ring = document.createElement('span');
+      ring.className = eintrag.klassen;
+      ring.style.left = x + 'px';
+      ring.style.top = y + 'px';
+      ring.addEventListener('animationend', () => ring.remove());
+      dom.glitzerSpur.appendChild(ring);
+    }, eintrag.verzogerung);
+  }
+}
+
+// Funkenregen: 44 Regenbogen-Funken fliegen kreisförmig nach außen
+function baueSupernovaFunken(x, y) {
+  const anzahl = 44;
+  for (let i = 0; i < anzahl; i++) {
+    const winkel = (i / anzahl) * Math.PI * 2 + Math.random() * .4;
+    const weite  = Math.random() * 110 + 140; // px Flugweite nach außen
+    baueNovaFunke(x, y, winkel, weite);
+  }
+}
+
+// Ein Nova-Funke (Regenbogenfarbe, großer Radius — größer als Glitzer-Spur)
+function baueNovaFunke(x, y, winkel, weite) {
+  if (!dom.glitzerSpur || glitzerAnzahl >= GLITZER_MAX) return;
+  glitzerAnzahl++;
+
+  const tone = REGENBOGEN_TONES[Math.floor(Math.random() * REGENBOGEN_TONES.length)];
+  const funke = document.createElement('span');
+  funke.className = 'glitzer glitzer--nova';
+  funke.style.width  = (Math.random() * 10 + 9) + 'px';
+  funke.style.height = funke.style.width;
+  funke.style.left = x + 'px';
+  funke.style.top  = y + 'px';
+
+  // Farbe + Flugbahn (Richtung/Winkel, weit nach außen, mit Blitzen)
+  funke.style.setProperty('--f', `hsl(${tone + Math.round(Math.random() * 16 - 8)} 100% 72%)`);
+  funke.style.setProperty('--dx', Math.round(Math.cos(winkel) * weite) + 'px');
+  funke.style.setProperty('--dy', Math.round(Math.sin(winkel) * weite) + 'px');
+  funke.style.setProperty('--dreh', Math.floor(Math.random() * 360) + 'deg');
+  funke.style.animationDuration = (Math.random() * 500 + 900) + 'ms';
+
+  funke.addEventListener('animationend', () => {
+    funke.remove();
+    glitzerAnzahl--;
+  });
+
+  dom.glitzerSpur.appendChild(funke);
 }
 
 // onError des Videos: Seite läuft ohne Musik weiter (Sterne + Glitzer),
@@ -264,7 +359,7 @@ function beiPlayerFehler() {
 // lassen (klemmender Start, besonders iPhone/Safari).
 function pruefeWiedergabe() {
   setTimeout(() => {
-    if (musikFehlgeschlagen) return;
+    if (musikFehlgeschlagen || novaGelaufen) return;
     const zustand = player && typeof player.getPlayerState === 'function'
       ? player.getPlayerState() : -1;
     // Zustand 1 (PLAYING) oder 3 (BUFFERING) heißt: Video ist unterwegs
@@ -293,7 +388,6 @@ function baueSterne() {
 
   // 110 Sterne — deutlich sichtbar, mit Strahleffekt; Farbverlosung:
   // Mischung aus Gold/Weiß (Studio-54) und kräftigen Regenbogenfarben.
-  const REGENBOGEN_TONES = [355, 40, 90, 150, 200, 260, 310]; // Rot→Violett
   const anzahl = 110;
   for (let i = 0; i < anzahl; i++) {
     const stern = document.createElement('span');
