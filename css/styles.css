@@ -604,3 +604,202 @@ a { color: var(--gold-hell); }
   .abschnitt { padding: 5rem 1.5rem; }
   .kopf-hinweis { font-size: .7rem; }
 }
+/* ------------------------------------------------------------
+   INTRO / TRAILER — komplett neu, unabhängig vom Rest
+   (alles hierzu steht in js/intro.js; Layer #intro baut sich
+   selbst in den body — hier nur das Design)
+   ------------------------------------------------------------ */
+
+/* Scrollfix solange das Intro liegt (#intro baut der JS) */
+body.intro-aktiv {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Schwarzer Vollbild-Layer, ganz oben, Handy-Maß */
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 999; /* über allem (Menü = 50, Glitzer-Spur = 8) */
+  display: grid;
+  place-items: center;
+  background: #000;
+  touch-action: none; /* Wischen/Scrollen des Intros nicht durchlassen */
+  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
+    max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  transition: opacity .8s ease;
+}
+
+/* Fade-out am Ende (bzw. beim Skip) */
+#intro.intro--weg { opacity: 0; }
+
+/* Schritt 1: das pulsierende goldene Herz als Start-Button */
+.intro-herz {
+  color: var(--gold-hell, #f5d98b);
+  font-size: clamp(4rem, 16vw, 7rem);
+  font-family: inherit;
+  line-height: 1;
+  text-shadow:
+    0 0 12px rgba(255, 230, 160, .95),
+    0 0 34px rgba(212, 175, 55, .75),
+    0 0 70px rgba(212, 175, 55, .45);
+  animation: intro-herz-puls var(--intro-hz, 1000ms) ease-in-out infinite;
+}
+
+/* Herzschlag-Rhythmus als Scale-Kurve: Beat, Beat, kleine Pause */
+@keyframes intro-herz-puls {
+  0%   { transform: scale(1); }
+  14%  { transform: scale(1.16); }
+  28%  { transform: scale(1); }
+  42%  { transform: scale(1.09); }
+  70%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* Herz verschwindet sanft, wenn der Trailer beginnt */
+.intro-herz--weg {
+  transition: opacity .6s ease, transform .6s ease;
+  opacity: 0;
+  transform: scale(1.5);
+}
+
+/* Skip-„✕" oben rechts (Safe-Area berücksichtigt) */
+.intro-skip {
+  position: fixed;
+  top: calc(max(8px, env(safe-area-inset-top)) + .5rem);
+  right: calc(max(8px, env(safe-area-inset-right)) + .7rem);
+  z-index: 1000; /* über dem #intro-Layer erreichbar bleiben */
+  color: var(--gold-hell, #f5d98b);
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: .5rem .7rem;
+  border-radius: 999px;
+}
+
+/* Bühne: zentrale Ebene für die Trailer-Schritte */
+.intro-buehne {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Ein Trailer-Schritt: mit Fade/Scale EINblenden („both" = Endzustand
+   bleibt), DANACH pochend im Herzschlag-Rhythmus (2. Animations-Spur,
+   Tempo = Herzrhythmus var — vom JS mit dem Sound zusammen geschaltet).
+   SCHRIFT: Monoton — dieselbe Deko-Schrift wie die Seiten-Titel
+   („Details" u. ä.). Sie gibt es nur in einer Strich-Stärke, deshalb
+   mehr „Fett": größere Größe + -webkit-text-stroke + kräftiger Glow. */
+.intro-schritt {
+  font-family: 'Monoton', 'Josefin Sans', cursive;
+  color: #fff3cf; /* heller als Gold-Hell — liest sich am Schwarz fast wie Neonschrift */
+  -webkit-text-stroke: 1.2px #ffe9ad; /* Striche spürbar dicker (falsches „bold") */
+  text-align: center;
+  line-height: 1.15;
+  font-size: clamp(2.6rem, 15vw, 6.5rem);
+  letter-spacing: .06em;
+  text-shadow:
+    0 0 8px rgba(255, 243, 207, .95),
+    0 0 24px rgba(255, 230, 160, .85),
+    0 0 60px rgba(212, 175, 55, .6);
+  animation:
+    intro-fade .6s ease both,
+    intro-schritt-poch var(--intro-hz, 1000ms) ease-in-out infinite;
+}
+
+/* Herzschlag-Rhythmus am TEXT: Beat, Beat, kleine Pause */
+@keyframes intro-schritt-poch {
+  0%   { transform: scale(1); }
+  14%  { transform: scale(1.05); }
+  28%  { transform: scale(1); }
+  42%  { transform: scale(1.03); }
+  70%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* Ausblendphase: alter Schritt weicht dem nächsten (JS fügt die
+   Klasse an, .5 s später kommt die neue — siehe zeigeSchritt) */
+.intro-schritt--raus {
+  animation: intro-schritt-weg .5s ease forwards;
+}
+
+@keyframes intro-schritt-weg {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(1.14); }
+}
+
+/* Finale: MATHILDA groß, 18 daneben/aufgerichtet, „★ BIRTHDAY PARTY ★" */
+.intro-schritt--finale {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+}
+
+.intro-finale-wort {
+  font-size: clamp(2.8rem, 14vw, 7rem);
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+/* die 18: heller + riesig — Blickfang des Finales */
+.intro-finale-zahl {
+  font-size: clamp(4.4rem, 24vw, 11rem);
+  font-weight: 900;
+  color: #fffef5;
+  -webkit-text-stroke: 2px #ffe9ad;
+  text-shadow:
+    0 0 14px rgba(255, 240, 200, 1),
+    0 0 40px rgba(255, 230, 160, .9),
+    0 0 80px rgba(212, 175, 55, .7);
+}
+
+/* Monoton gibt es nur in einer Strich-Stärke — „fetter" läuft hier
+   bewusst über Größe + text-stroke + Glow, nicht über font-weight. */
+.intro-finale-party {
+  font-size: clamp(1rem, 4.2vw, 1.6rem);
+  letter-spacing: .3em;
+  text-indent: .3em; /* zentriert den Buchstabenraster-Abstand aus */
+  color: #ffd97a;
+  -webkit-text-stroke: .6px #ffe9ad;
+  text-shadow:
+    0 0 8px rgba(255, 230, 160, .8),
+    0 0 28px rgba(212, 175, 55, .5);
+}
+
+/* Ein Gold-Glitzer-Funke im Finale-Burst (kleiner 4-zackiger Stern) */
+.intro-funke {
+  position: absolute;
+  background: radial-gradient(circle at 50% 50%,
+    #fffef5 0%, var(--gold-hell, #f5d98b) 55%, var(--gold, #d4af37) 100%);
+  clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+  filter:
+    drop-shadow(0 0 4px rgba(255, 245, 205, 1))
+    drop-shadow(0 0 12px rgba(212, 175, 55, .7));
+  animation: intro-funke-fliegt 1s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes intro-funke-fliegt {
+  from { opacity: 1; transform: translate(0, 0) rotate(var(--fd, 0deg)) scale(1); }
+  to   { opacity: 0; transform: translate(var(--fx, 0), var(--fy, 0)) rotate(var(--fd, 0deg)) scale(.2); }
+}
+
+.intro-fade {
+  animation: intro-fade .6s ease both;
+}
+
+@keyframes intro-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ------------------------------------------------------------
+   INTRO bei prefers-reduced-motion: kein Sound (JS), kein Puls,
+   Texte statisch sichtbar — Funkten entfallen (JS-Guard)
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .intro-herz, .intro-schritt, .intro-funke { animation: none !important; }
+  .intro-schritt { opacity: 1; transform: none; }
+  .intro-funke { display: none; }
+}
