@@ -688,20 +688,16 @@ body.intro-aktiv {
    bleibt), DANACH pochend im Herzschlag-Rhythmus (2. Animations-Spur,
    Tempo = Herzrhythmus var — vom JS mit dem Sound zusammen geschaltet).
    SCHRIFT: Monoton — dieselbe Deko-Schrift wie die Seiten-Titel
-   („Details" u. ä.). Sie gibt es nur in einer Strich-Stärke, deshalb
-   mehr „Fett": größere Größe + -webkit-text-stroke + kräftiger Glow. */
+   („Details" u. ä.). Kein text-stroke/Starke-Glow: Monoton ist schon
+   reich verziert, Gold auf Schwarz liest sich so am klarsten. */
 .intro-schritt {
   font-family: 'Monoton', 'Josefin Sans', cursive;
-  color: #fff3cf; /* heller als Gold-Hell — liest sich am Schwarz fast wie Neonschrift */
-  -webkit-text-stroke: 1.2px #ffe9ad; /* Striche spürbar dicker (falsches „bold") */
+  color: #ffd97a; /* Gold-Ton ohne Stroke — Monoton liest sich so klar */
   text-align: center;
   line-height: 1.15;
   font-size: clamp(2.6rem, 15vw, 6.5rem);
   letter-spacing: .06em;
-  text-shadow:
-    0 0 8px rgba(255, 243, 207, .95),
-    0 0 24px rgba(255, 230, 160, .85),
-    0 0 60px rgba(212, 175, 55, .6);
+  text-shadow: 0 0 10px rgba(212, 175, 55, .35); /* nur noch dezenter Schein */
   animation:
     intro-fade .6s ease both,
     intro-schritt-poch var(--intro-hz, 1000ms) ease-in-out infinite;
@@ -746,25 +742,18 @@ body.intro-aktiv {
 .intro-finale-zahl {
   font-size: clamp(4.4rem, 24vw, 11rem);
   font-weight: 900;
-  color: #fffef5;
-  -webkit-text-stroke: 2px #ffe9ad;
-  text-shadow:
-    0 0 14px rgba(255, 240, 200, 1),
-    0 0 40px rgba(255, 230, 160, .9),
-    0 0 80px rgba(212, 175, 55, .7);
+  color: #ffd97a;
+  text-shadow: 0 0 12px rgba(212, 175, 55, .4);
 }
 
-/* Monoton gibt es nur in einer Strich-Stärke — „fetter" läuft hier
-   bewusst über Größe + text-stroke + Glow, nicht über font-weight. */
+/* Monoton — „fett" hier nur über die große Größe, kein Stroke/Glow,
+   damit die Buchstaben klar lesbar bleiben. */
 .intro-finale-party {
   font-size: clamp(1rem, 4.2vw, 1.6rem);
   letter-spacing: .3em;
   text-indent: .3em; /* zentriert den Buchstabenraster-Abstand aus */
   color: #ffd97a;
-  -webkit-text-stroke: .6px #ffe9ad;
-  text-shadow:
-    0 0 8px rgba(255, 230, 160, .8),
-    0 0 28px rgba(212, 175, 55, .5);
+  text-shadow: 0 0 8px rgba(212, 175, 55, .3);
 }
 
 /* Ein Gold-Glitzer-Funke im Finale-Burst (kleiner 4-zackiger Stern) */

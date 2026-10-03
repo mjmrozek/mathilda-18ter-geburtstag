@@ -1,6 +1,6 @@
 # CLAUDE.md — Mathildas 18ter Geburtstag · Studio-54-Einladung
 
-Zusammenfassung aus MEINER (Claude-)Sicht, Stand **2026-10-02 (Umstellung „einfacher Ablauf")**. Für neue Sessions: Lies zuerst »Ablauf« und »Feste Entscheidungen« — dort steht, was NICHT leichtfertig geändert werden darf.
+Zusammenfassung aus MEINER (Claude-)Sicht, Stand **2026-10-03 (Trailer-Intro + Stereo-Überarbeitung)**. Für neue Sessions: Lies zuerst »Ablauf« und »Feste Entscheidungen« — dort steht, was NICHT leichtfertig geändert werden darf.
 
 ## Projekt
 
@@ -25,19 +25,33 @@ One-Page-Geburtstagseinladung im **Studio-54-Stil** (Schwarz & Gold, Glitzer, Ne
 ## Dateistruktur
 
 ```
-index.html            — Markup; alle Sektionen + festes Menü oben
-css/styles.css        — komplettes Styling; Farbsystem & --video-filter in :root
+index.html            — Markup; alle Sektionen + festes Menü oben + eine Script-Zeile für intro.js
+css/styles.css        — komplettes Styling; Farbsystem & --video-filter in :root;
+                        INTRO/TRAILER-Block am ENDE der Datei (anhang für js/intro.js)
 js/translations.js    — ALLE sichtbaren Texte in de/en/pl (UEBERSETZUNGEN-Objekt)
 js/main.js            — komplette Logik; Konstanten ganz oben
+js/intro.js           — Trailer-Intro (komplett unabhängig, siehe unten; berühren nicht!)
 images/einladung_1_<lang>.jpeg — Titel-Karte (Hero-Bild)
 images/einladung_2_<lang>.jpeg — Details-Karte (Galerie)
          <lang> = de | en | pl  (Namen so vom Nutzer angelegt, beibehalten!)
 ```
 
+## Trailer-Intro (2026-10-03, komplett unabhängiger Anhang — NICHT in bestehenden Code integrieren!)
+
+Erbaut als isolierter Anhang: **js/intro.js** baut sich den Layer `#intro` SELBST in den body (index.html hat nur eine `<script>`-Zeile dazubekommen, styles.css einen INTRO-Block am Ende). Bestehender Code wurde NICHT angerührt — so lassen!
+
+- **Ablauf:** schwarzer Layer (z-index 999) mit pulsierendem goldenen Herz ♥ (Start-Button, kein Text) → Klick startet Web-Audio-Herzschlag („lub-dub"-Loop, entsteht ERST im Klick — Nutzergeste!) → Trailer-Schritte je ~2,6 s: „2027" → „23.01." → „19:00" → Finale „MATHILDA 18" + „★ BIRTHDAY PARTY ★" mit kräftigem Doppel-Herzschlag + Gold-Glitzer-Burst → Fade-out zur normalen Seite.
+- **SKIP: NUR über das „✕" oben rechts** (Nutzer-Entscheidung!). Kein Tippen-irgendwo-Skip — versehentliche Taps während des Trailers tun absichtlich nichts.
+- **Erscheint bei JEDEM Aufruf** (kein Speichern).
+- **Schrift = Monoton** (Seiten-Titel-Schrift). „Fett" läuft über Größe + `-webkit-text-stroke` + Glow — Monoton hat nur eine Strich-Stärke, font-weight bringt nichts!
+- Texte als Konstante `INTRO_SEQUENCE` oben in intro.js. Herzschlag-Tempo & Text-Puls synchron über `--intro-hz` (JS schaltet beides zusammen).
+- `prefers-reduced-motion`: still, ohne Puls/Funken, Texte statisch.
+
 ## Ablauf beim Seitenaufruf (Kern-Ablauf — die Seele der Seite! EINFACHER ABLAUF, Nutzer-Entscheidung 2026-10-02)
 
 Implementiert in `initialisiere()` (main.js):
 
+0. **VORGESCHALTET (intro.js, unabhängig):** Schwarzes Trailer-Intro (Herz ♥ → Trailer → Fade-out). Skip nur über „✕" oben rechts. Danach genau Punkt 1.
 1. **Jeder Aufruf:** sofort die **Einladungsseite auf Deutsch** — keine Sprach-Overlay-, keine Consent-Maske mehr (alte Overlays wurden komplett entfernt).
 2. **Festes Mini-Menü oben** (`.kopf`, fix, **nie weg**): 🎵-Musik-Button + die **zwei anderen** Sprach-Buttons (auf Deutsch → *English · Polski*, auf Englisch → *Deutsch · Polski*, auf Polnisch → *Deutsch · English*; geschaltet von `aktualisiereMenu()`). Sprach-Buttons stehen ALLE 3 statisch in der index.html, JS blendet nur die aktive aus.
 3. Unter dem 🎵-Button (Teil der fixen Leiste) der **IP/YouTube-Hinweis** + Google-Privacy-Link — zusammen mit dem Button ausblenden, sobald Musik läuft (bzw. bei onError).
@@ -57,6 +71,10 @@ Implementiert in `initialisiere()` (main.js):
 - **Galerie: KEIN Karussell** — die **2 Karten der gewählten Sprache groß übereinander gestapelt** (`data-lang`-Filter in `aktualisiereGalerieSprache()`), damit der Kartentext lesbar ist.
 - **Video-Behandlung:** schwarz-weiß + weichgezeichnet, damit Inhalte hervorstehen — als CSS-Variable `--video-filter` (styles.css, in `:root`), z. B. `grayscale(1) blur(6px)`; `scale(1.15)` am iframe gleicht blur-Ränder aus.
 - Musik **beginnt nie ohne explizite Nutzergeste** (Konservierungsregel für iOS/Safari + Datenschutz) — der 🎵-Klick ist diese Geste.
+- **Trailer-Intro (2026-10-03):** erscheint bei jedem Aufruf, Skip **NUR über „✕" oben rechts** — kein Tipp-irgendwo-Skip (Nutzer ausdrücklich!). Intro-Code als isolierter Anhang halten (intro.js + CSS-Block am Ende), bestehende Dateien nicht umbauen. Schrift Monoton, Texte groß/fett/lesbar, Finale „★ BIRTHDAY PARTY ★".
+- **Musik-Pill „Klicke mich!"** (de/en/pl) mit **Wachs-Effekt** (jeder Klick macht sie größer, `--wuchs` bis Stufe 6) und **Supernova**, sobald der Ton wirklich läuft (Blitz + 2 Schockwellen-Ringe + 44 Regenbogen-Funken, dann Button + IP-Hinweis endgültig weg). Nicht zurückbauen — Nutzer wollte Anreiz-Gestaltung!
+- **Hintergrund-Sterne sind 4-strahlige Funkensterne** mit Regenbogen-Mischung (55 % bunt / 45 % Gold) — bewusst deutlich sichtbar (Nutzer-Wunsch „deutlicher, mit Strahlen, Regenbogenfarben").
+- **Video-Filter REIN Schwarz-Weiß:** `--video-filter: grayscale(1) blur(2px)` — grayscale < 1 lässt Restfarbe durch und passt nicht zur Farbpalette (Nutzer 2026-10-03).
 
 ## Datenschutz-Detail (🎵-Klick = Einwilligung — wichtig!)
 
@@ -67,7 +85,9 @@ Implementiert in `initialisiere()` (main.js):
 
 ## Konstanten & Textänderungen (Schnellreferenz)
 
-**`js/main.js` ganz oben:** `VIDEO_ID` (`uQ9_MwZIaoc`, Bee Gees – More Than a Woman), `MUSIK_LAUTSTAERKE` (50), `FALLBACK_TIMEOUT_MS` (2000), `MAPS_ZIEL` (Google-Maps-Ziel — bei Adressänderung zusätzlich den `href` im Details-Ticket der index.html ändern!).
+**`js/main.js` ganz oben:** `VIDEO_ID` (`uQ9_MwZIaoc`, Bee Gees – More Than a Woman), `MUSIK_LAUTSTAERKE` (50), `FALLBACK_TIMEOUT_MS` (2000), `MAPS_ZIEL` (Google-Maps-Ziel — bei Adressänderung zusätzlich den `href` im Details-Ticket der index.html ändern!), `REGENBOGEN_TONES` (Hue-Liste für Sterne/Nova-Funken).
+
+**`js/intro.js` ganz oben:** `INTRO_SEQUENCE` („2027", „23.01.", „19:00", „MATHILDA 18"), Timings (`INTRO_SCHRITT_MS` 2600 u. a.), `INTRO_FUNKEN_ANZAHL` (46).
 
 **Alle sichtbaren Texte:** `js/translations.js` — 3 Sprachblöcke (`de:`, `en:`, `pl:`). Anbindung via `data-i18n` (textContent/innerHTML), `data-i18n-alt` (alt), `data-i18n-aria` (aria-label). `wendeSpracheAn()` wechselt ohne Reload; Rückfall: Deutsch, falls Schlüssel fehlt. Menü-Keys: `musik_button`, `menu_aria`, `musik_hinweis`, `datenschutz_link`.
 
@@ -77,8 +97,11 @@ Implementiert in `initialisiere()` (main.js):
 
 - iframe des Videos braucht **`pointer-events: none`**, sonst fängt ein Tap den YouTube-Player ab und Scrollen/Drücken blockiert.
 - Fixe Menüleiste oben (`.kopf`): Hero-`padding-top` rechnet ihre Höhe MIT (aktuell `max(14px, env(safe-area-inset-top)) + 5.6rem`) — größerer IP-Hinweis → padding nachziehen. `.kopf` selbst hat `pointer-events: none` (Buttons wieder auf `auto`), damit man unter der Leiste noch scrollen kann.
-- `prefers-reduced-motion` schaltet Deko-Animationen aus (Sterne/Puls/Hero-Einblendung) — bei jeder neuen Animation mitdenken.
-- Ehemaliges Problem: das Sprach-Overlay wurde entfernt — also auch kein `body.overlay-offen`/Scrollbar-Sperre mehr im CSS/JS (altes Muster nicht wieder einbauen).
+- `prefers-reduced-motion` schaltet Deko-Animationen aus (Sterne/Puls/Hero-Einblendung) — bei jeder neuen Animation mitdenken; intro.js/Sterne/Nova haben eigene Guards + media-query-Regeln.
+- Sterne/Nova-Funken: clip-path sitzt auf `::before`, drop-shadow-Filter auf dem Elternteil — **nicht auf dasselbe Element legen**, sonst schneidet der clip-path den Glow ab. (Die alte `.glitzer`-Klasse der Glitzer-Spur hat das Problem noch — die Nova-Varianz `.glitzer--nova` übersteuert das.)
+- Supernova nur über Play-Status-Events (PLAYING) auslösen und via `novaGelaufen`-Merker genau einmal — `pruefeWiedergabe()` hat einen Guard, dass der Button während der Nova nicht zurückommt.
+- Trailer-Intro: keines der alten Muster anfassen (kein Sprach-/Consent-Overlay!) — intro.js ist bewusst eigenständig, Skip-Logik NUR am „✕".
+- Ehemaliges Problem: das Sprach-Overlay wurde entfernt — also auch kein `body.overlay-offen`/Scrollbar-Sperre mehr im CSS/JS (altes Muster nicht wieder einbauen). Scrollfix läuft aktuell über `body.intro-aktiv` (intro.js setzt/entfernt es).
 
 ## Deployment-Stand & Git
 
@@ -87,12 +110,13 @@ Implementiert in `initialisiere()` (main.js):
 
 ## Lokal testen
 
-`npx serve .` (oder `python3 -m http.server`) — **nicht** per Doppelklick auf index.html (file:// macht YouTube/Font-Verhalten unzuverlässig). Keine Testhelfer mehr nötig: Seite startet immer auf Deutsch, Musik nur per 🎵-Klick.
+`npx serve .` (oder `python3 -m http.server`) — **nicht** per Doppelklick auf index.html (file:// macht YouTube/Font-Verhalten unzuverlässig). Keine Testhelfer mehr nötig: Seite startet immer auf Deutsch, Musik nur per 🎵-Klick. Beim Testansehen kommt zuerst das **Trailer-Intro** (Herz starten oder ✕ überspringen) — Normalverhalten!
 
 ## Erledigt, nur zur Erinnerung
 
 - **og:image / twitter:image auf absolute URL** umgestellt (index.html): `https://mathildas-18ter-geburtstag.netlify.app/images/einladung_1_de.jpeg` — nötig für die zuverlässige WhatsApp-Vorschau.
 - **Ein-Klick-Musikstart** (3. Session-Runde 2026-10-02): YouTube-iframe wird synchron in der 🎵-Klick-Geste eingesetzt, API attacht sich parallel — Doppelklick-Bug behoben.
+- **2026-10-03:** Hintergrund-Sterne → 4-strahlige Regenbogen-Funkensterne; 🎵-Pill → „Klicke mich!“ mit Wachs-Effekt + Supernova beim echten Play; Video-Filter → `grayscale(1)` (rein S/W); **Trailer-Intro komplett neu dazu** (`js/intro.js` + INTRO-CSS-Block + eine Script-Zeile).
 
 ## Offene To-Dos
 
