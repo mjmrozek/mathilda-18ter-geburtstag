@@ -20,7 +20,7 @@
   /* Hintergrundvideo-Behandlung: leicht entsättigt + sanft weichgezeichnet
      (Nutzer 2026-10-02: Video deutlicher erkennbar machen — vorher
      grayscale(1) blur(6px); nur hier nachregeln, z. B. blur(4px). */
-  --video-filter: grayscale(.8) blur(2px);
+  --video-filter: grayscale(1) blur(2px);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
