@@ -110,6 +110,7 @@ Implementiert in `initialisiere()` (main.js):
 ## Deployment-Stand & Git
 
 - **Netlify** live: **https://mathildas-18ter-geburtstag.netlify.app** (Deploy-Branch `main` = automatisches Deploy bei jedem Push). GitHub-Repo synchron; `main` = Deploy-Branch. **AB 2026-10-02: Der Nutzer committet und pusht SELBST — Claude ändert nur Dateien, niemals git commit/push.** (Alte Regel „direkt auf main committen" ist ungültig.)
+- **WEITERLEITUNG (2026-10-04, Nutzer):** Die **eigentliche Einladung lebt jetzt auf https://mathilda-party-18.netlify.app** (separates Projekt). Diese Domain hier leitet NUR noch dorthin um — über `_redirects` im Wurzelverzeichnis: `/* https://mathilda-party-18.netlify.app/:splat 301!`. Seite/Intro/Musik von HIER nicht mehr weiterentwickeln (außer die Domain soll wieder aktiv werden); Änderungen an der Einladung gehören ins andere Projekt.
 - `.gitignore`: `.DS_Store`, `/einladung_*.jpeg` im Wurzelverzeichnis (Nutzer-Originals = Kopien der images/), `.waylog/` (Session-Protokolle — nichts für GitHub!), `*.swp`.
 
 ## Lokal testen
